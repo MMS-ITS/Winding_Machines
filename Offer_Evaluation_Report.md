@@ -3,11 +3,13 @@
 | | |
 |---|---|
 | **Prepared for** | MMS Consortium, Chattogram |
-| **Evaluation date** | 27 October 2026 |
+| **Evaluation date** | 27 October 2026 (revision 2: Gonghong's commercial quotation added and Gonghong re-scored) |
 | **Requirement** | 48-spindle Soft Winder (package dyeing), 60-spindle Hard Winder (post-dyeing rewinding), 48-spindle Sewing-Thread Winder with automatic doffing and feeding. Price basis CFR Chittagong (Incoterms 2020). |
 | **Offers evaluated** | Charming Star International (Taiwan), Foshan Gonghong (China), Jiangsu Tangshi (China), Milhan Makine (Turkey), Ningbo Credit Ocean (China), Ningbo Dingming (China), Zhejiang Taihe (China) |
 
 > **Source note.** `Winding_Machines_Combined_Specification.pdf` is not in this repository. The requirements were taken from the RFQ text sent to every vendor, the 21-line Technical Compliance Checklist, and the soft-bobbin drawing (with the top/bottom correction) found in the Charming Star email thread. Every file in the seven vendor zip files was read: quotations, datasheets, catalogue pages, checklists, packing and spare-parts lists, email threads and photos. Videos were noted as supplied but not scored frame by frame.
+>
+> **Revision 2.** Gonghong's quotation GH-XP26-14840 of 10 Oct 2026 was not in the Gonghong zip file. MMS supplied it separately, and it is now in the repository as `Foshan Gonghong Quotation GH-XP26-14840.pdf`. With it, Gonghong moves from 4th to 1st place. No other vendor's scores changed.
 
 ---
 
@@ -15,15 +17,19 @@
 
 | Rank | Vendor | **Overall /10** | Technical /10 | Commercial /10 | Full-scope price (USD) | Verdict |
 |:-:|---|:-:|:-:|:-:|---|---|
-| 1 | **Ningbo Dingming** | **8.10** | 8.40 | 7.65 | 177,000 CFR CTG | Best value. Shortlist. |
-| 2 | **Jiangsu Tangshi** (Option B, fully automatic) | **7.64** | 8.40 | 6.50 | 191,180 CFR CTG | Shortlist. |
-| 3 | **Zhejiang Taihe** | **7.12** | 7.80 | 6.10 | 145,700 CNF CTG (no auto doffing) | Shortlist only if it adds auto doffing, or for the soft winder alone. |
-| 4 | **Foshan Gonghong** | **6.24 \*** | **9.00 (best)** | 2.10 \* | Not quoted | Technically the best. Ask for prices now. |
+| 1 | **Foshan Gonghong** | **8.40** | **8.90 (best)** | 7.65 | **139,467 CIF CTG** (lowest compliant price) | Best overall and best technical. Shortlist; renew the lapsed validity and push for L/C. |
+| 2 | **Ningbo Dingming** | **8.10** | 8.40 | 7.65 | 177,000 CFR CTG | Strong alternative. Shortlist. |
+| 3 | **Jiangsu Tangshi** (Option B, fully automatic) | **7.64** | 8.40 | 6.50 | 191,180 CFR CTG | Shortlist. |
+| 4 | **Zhejiang Taihe** | **7.12** | 7.80 | 6.10 | 145,700 CNF CTG (no auto doffing) | Shortlist only if it adds auto doffing, or for the soft winder alone. |
 | 5 | Charming Star International | 4.91 | 5.75 | 3.65 | 46,930 FOB Shanghai (sewing machine not compliant) | Not recommended as offered. |
 | 6 | Ningbo Credit Ocean | 3.68 | 3.60 | 3.80 | 114,200 to 121,760 FOB Ningbo | Cannot be evaluated until a full offer arrives. |
 | 7 | Milhan Makine | 2.60 | 3.00 | 2.00 | 55,000 EXW Istanbul (hard winder only) | Not recommended. |
 
-\* Gonghong sent complete technical data but **no machine prices**, so most of its commercial lines score zero. If it quotes CFR prices close to Dingming's and Tangshi's, with L/C payment and a normal lead time, its overall score would be about **8.4**, which would put it in **first place**.
+Gonghong and Dingming have the **same commercial score (7.65)** for different reasons:
+- **Gonghong is ahead on** price (21% cheaper for the full scope) and on its priced spares and packing list.
+- **Dingming is ahead on** terms: L/C at sight, 30-day delivery, a 2-year warranty and a valid offer.
+
+Because Gonghong's technical score is higher, it **ranks first at every technical/commercial weighting**.
 
 **Overall score = 60 % Technical + 40 % Commercial.** The rules behind each part are in Section 2 and the line-by-line scores are in Section 3.
 
@@ -76,13 +82,13 @@
 | S2 (0.75) | 0.40 | 0.60 | 0.40 | 0 | 0.20 | 0.60 | 0.75 |
 | S3 (0.75) | 0.35 | 0.65 | 0.50 | 0 | 0.15 | 0.60 | 0.75 |
 | S4 (0.5) | 0.25 | 0.50 | 0.35 | 0 | 0.10 | 0.35 | 0.40 |
-| S5 (0.5) | 0.45 | 0.45 | 0.40 | 0 | 0.10 | 0.40 | 0.50 |
-| **Soft winder (3.0)** | **1.95** | **2.70** | **2.15** | **0** | **0.85** | **2.45** | **2.90** |
+| S5 (0.5) | 0.45 | 0.40 | 0.40 | 0 | 0.10 | 0.40 | 0.50 |
+| **Soft winder (3.0)** | **1.95** | **2.65** | **2.15** | **0** | **0.85** | **2.45** | **2.90** |
 | H1 (0.5) | 0.50 | 0.50 | 0.50 | 0.50 | 0.30 | 0.50 | 0.50 |
 | H2 (0.5) | 0.45 | 0.50 | 0.50 | 0.50 | 0.20 | 0.50 | 0.50 |
-| H3 (0.5) | 0.30 | 0.45 | 0.40 | 0.50 | 0.10 | 0.40 | 0.40 |
+| H3 (0.5) | 0.30 | 0.40 | 0.40 | 0.50 | 0.10 | 0.40 | 0.40 |
 | H4 (0.5) | 0.30 | 0.50 | 0.45 | 0.35 | 0.10 | 0.40 | 0.50 |
-| **Hard winder (2.0)** | **1.55** | **1.95** | **1.85** | **1.85** | **0.70** | **1.80** | **1.90** |
+| **Hard winder (2.0)** | **1.55** | **1.90** | **1.85** | **1.85** | **0.70** | **1.80** | **1.90** |
 | W1 (0.5) | 0.40 | 0.50 | 0.50 | 0 | 0.35 | 0.50 | 0.50 |
 | W2 (1.0) | 0 | 1.00 | 1.00 | 0 | 0.70 | 1.00 | 0 |
 | W3 (0.5) | 0.35 | 0.45 | 0.50 | 0 | 0.25 | 0.45 | 0.50 |
@@ -90,9 +96,9 @@
 | W5 (0.5) | 0.30 | 0.50 | 0.40 | 0 | 0.15 | 0.45 | 0.40 |
 | **Sewing-thread winder (3.0)** | **1.20** | **2.85** | **2.90** | **0** | **1.60** | **2.90** | **1.85** |
 | B (0.5) | 0.15 | 0.30 | 0.30 | 0.20 | 0.15 | 0.30 | 0.25 |
-| E (0.5) | 0.35 | 0.50 | 0.45 | 0.45 | 0.15 | 0.40 | 0.45 |
-| D (1.0) | 0.55 | 0.70 | 0.75 | 0.50 | 0.15 | 0.55 | 0.45 |
-| **TECHNICAL TOTAL (10)** | **5.75** | **9.00** | **8.40** | **3.00** | **3.60** | **8.40** | **7.80** |
+| E (0.5) | 0.35 | 0.45 | 0.45 | 0.45 | 0.15 | 0.40 | 0.45 |
+| D (1.0) | 0.55 | 0.75 | 0.75 | 0.50 | 0.15 | 0.55 | 0.45 |
+| **TECHNICAL TOTAL (10)** | **5.75** | **8.90** | **8.40** | **3.00** | **3.60** | **8.40** | **7.80** |
 
 Tangshi **Option A** (TS008O "standard", 12 × 4 spindles, no automatic doffing) scores **7.15** technical. It loses W2 entirely and is weaker on W3 to W5.
 
@@ -100,16 +106,39 @@ Tangshi **Option A** (TS008O "standard", 12 × 4 spindles, no automatic doffing)
 
 | Code (max) | Charming Star | Gonghong | Tangshi B | Milhan | Credit Ocean | Dingming | Taihe |
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| P (4.0) | 2.00 | 0 | 2.50 | 0.50 | 3.50 | 2.75 | 2.00 |
-| I (1.0) | 0.40 | 0 | 0.90 | 0.10 | 0.30 | 1.00 | 1.00 |
-| Pay (1.0) | 0.40 | 0 | 0.90 | 0.20 | 0 | 0.90 | 0.90 |
-| L (1.0) | 0.40 | 0 | 0.60 | 0.30 | 0 | 1.00 | 0.70 |
+| P (4.0) | 2.00 | 3.75 | 2.50 | 0.50 | 3.50 | 2.75 | 2.00 |
+| I (1.0) | 0.40 | 1.00 | 0.90 | 0.10 | 0.30 | 1.00 | 1.00 |
+| Pay (1.0) | 0.40 | 0.40 | 0.90 | 0.20 | 0 | 0.90 | 0.90 |
+| L (1.0) | 0.40 | 0.40 | 0.60 | 0.30 | 0 | 1.00 | 0.70 |
 | W (2.0) | 0.20 | 1.10 | 1.20 | 0.80 | 0 | 1.50 | 1.30 |
 | Sp (1.0) | 0.25 | 1.00 | 0.40 | 0.10 | 0 | 0.50 | 0.20 |
-| **COMMERCIAL TOTAL (10)** | **3.65** | **2.10** | **6.50** | **2.00** | **3.80** | **7.65** | **6.10** |
-| **OVERALL (0.6 T + 0.4 C)** | **4.91** | **6.24** | **7.64** | **2.60** | **3.68** | **8.10** | **7.12** |
+| **COMMERCIAL TOTAL (10)** | **3.65** | **7.65** | **6.50** | **2.00** | **3.80** | **7.65** | **6.10** |
+| **OVERALL (0.6 T + 0.4 C)** | **4.91** | **8.40** | **7.64** | **2.60** | **3.68** | **8.10** | **7.12** |
 
 ### 3.3 Reasons behind each vendor's scores
+
+**Foshan Gonghong (overall 8.40, technical 8.90).** Quotation GH-XP26-14840 of 10 Oct 2026, signed and stamped. Offered models:
+- GH018-S soft winder: 8 single-sided sets × 6 spindles.
+- GH018-M hard winder: 10 sets × 6 spindles.
+- GH018-A fully automatic tuck-in thread winder: 12 sets × 4 spindles.
+- GH019-SA automatic A-cone thread winder as a cheaper alternative: 12 sets × 4 spindles / 8 cones.
+
+**Why it scores well:**
+- It has the most complete technical package. The soft and hard winders run at 300–1,100 m/min with a spindle motor each, computer anti-patterning and a 250 mm maximum package. The hard winder takes cones from 3°30′ to 9°15′.
+- The quotation confirms the GH018-A **doffing and automatic tuck-in**, with circulating, heated silicone oiling. The datasheet adds 300–1,200 m/min and ±0.5% length accuracy.
+- Full scope with automatic doffing costs **USD 139,467 CIF Chattogram**, the lowest compliant price. That is 21% below Dingming and 27% below Tangshi, and CIF includes insurance as well as freight.
+- It is the only vendor with priced spare-parts lists and a full packing list (2 × 40HQ, 21 packages, 10,950 kg gross, 69.5 m³).
+
+**Why it loses points:**
+- **Validity was 10 days, so the offer lapsed on 20 Oct 2026.**
+- Payment is 30% TT deposit and 70% before shipment, with no L/C. Delivery is 60 days.
+- The quotation and datasheet disagree in places:
+  - Supply: 220/380 V in the quote, 400 V ±10% in the datasheet.
+  - Spindle power: 60 W in the quote, 100 W in the datasheet.
+  - Tensioning: the quote lists only a disc tensioner, while the datasheet describes a spring pressure-balance system and electric waxing.
+- No blower or splicer is included.
+- It answered D4 (1,400 rpm) NO without a remark and left the checklist header blank.
+- Support is remote and video only. Traverse is 147 mm.
 
 **Ningbo Dingming (overall 8.10).** Offered models: DM0702-SF soft, DM0702-TH hard, and DM0605 fully automatic (2 sets, 50 heads).
 - **Why it scores well:** Every item is priced CFR Chittagong. It has the longest warranty (2 years), the shortest lead time (30 days after L/C), L/C at sight, and free spares with each machine. The DM0605 includes automatic doffing, feeding and tail insertion, runs up to 1,200 m/min, and has a 63–152 mm traverse. The soft winder's catalogue states an adjustable density of 0.2–0.4 g/cm³. Dingming also says it delivered 360 soft-winder spindles and 10 auto-winder spindles in Dhaka in September 2026 (per its 9 Oct email) and offered a site visit.
@@ -122,10 +151,6 @@ Tangshi **Option A** (TS008O "standard", 12 × 4 spindles, no automatic doffing)
 **Zhejiang Taihe (overall 7.12).** Offered models: TH-11A-1 precision soft winder, TH-8H hard, and TH-15A thread winder (12 × 4 spindles).
 - **Why it scores well:** It offers the best soft winder of all the bids. The TH-11A-1 is a precision winder with programmable density and package shape, a 147–250 mm variable traverse, packages up to 250 mm and 2 kg, and it handles filament, spun and cotton yarns. The hard winder price includes an air splicer and a blower. Prices are CNF Chattogram, payment is L/C at sight, and the technician rate is $80 a day.
 - **Why it loses points:** The TH-15A has **no automatic doffing or feeding**, which costs the full W2 point. Taihe returned no checklist and no point-by-point compliance statement. It did not state offer validity, packing data or a spares list. The soft winder is 18.1 m long, single-sided.
-
-**Foshan Gonghong (technical 9.00, overall 6.24 provisional).** Offered models: GH018-S soft, GH018-M hard, and GH018-A Auto (12 × 4 spindles).
-- **Why it scores well:** It has the most complete and consistent technical package. Soft and hard winders run up to 1,100 m/min, with 250 mm maximum packages and a spring pressure-balance system for density. The supply rating is 400 V ±10%, which covers the full 380–440 V range. The GH018-A has automatic feeding and tube changing, runs at 300–1,200 m/min, and holds ±0.5% length accuracy. It is also the only vendor with priced spare-parts lists and a full packing list (2 × 40HQ, 21 packages, 10,950 kg gross, 69.5 m³).
-- **Why it loses points:** No machine prices, payment terms, lead time or Incoterm were given. It answered D4 (1,400 rpm) NO without a remark and left the checklist header blank. It offers remote and video support only, with no on-site commissioning. The standard traverse is 147 mm.
 
 **Charming Star (overall 4.91).** Offered models: CMcw-600C soft, CMcw-600CH hard, and CMsp-2A spool winder (4 sets × 6 spindles × 2 bobbins).
 - **Why it scores well:** It has a low headline price. The soft and hard winders come with 4 splicers each and a blower and suction unit on the soft machine. Packages go up to Ø250 mm, and Charming Star sent five videos.
@@ -146,7 +171,8 @@ Tangshi **Option A** (TS008O "standard", 12 × 4 spindles, no automatic doffing)
 | Vendor | Soft, 48 sp | Hard, 60 sp | Sewing thread, 48 sp | Extras | Freight | **Total** | Basis |
 |---|--:|--:|--:|--:|--:|--:|---|
 | Charming Star | 16,950 | 18,860 | 11,120 (manual spool winder, 4 sets) | incl. 4 splicers per winder | ~6,800 (rough estimate) | **46,930** (≈53,730 CFR est.) | FOB Shanghai |
-| Gonghong | not quoted | not quoted | not quoted | spares 417 + 3,278 | n/a | **n/a** | n/a |
+| **Gonghong** | **12,332** (8 × 6 sp) | **15,415** (10 × 6 sp) | **111,720** (GH018-A, 12 × 4 sp, auto doffing) | spares 417 + 3,278 (optional) | incl. (7,347 freight and insurance) | **139,467** (FOB Guangzhou 132,120) | **CIF CTG** |
+| Gonghong, alternative | 12,332 | 15,415 | 72,680 (GH019-SA, 12 × 4 sp / 8 cones, no auto doffing stated) | as above | incl. | **100,427** | CIF CTG |
 | Tangshi A | 14,880 | 18,000 | 81,600 (12 × 4 sp, no auto doffing) | 6,200 splicers and blowers | 8,100 | **128,780** | CFR CTG |
 | Tangshi B | 14,880 | 18,000 | 144,000 (2 × 24 sp, auto doffing) | 6,200 splicers and blowers | 8,100 | **191,180** | CFR CTG |
 | Milhan | n/a | 55,000 (50,000 net to MMS) | n/a | cleaner incl. | buyer | **55,000** | EXW Istanbul |
@@ -156,8 +182,9 @@ Tangshi **Option A** (TS008O "standard", 12 × 4 spindles, no automatic doffing)
 | Taihe | 44,500 (precision) | 18,800 (incl. splicer and blower) | 79,200 (12 × 4 sp, no auto doffing) | 3,200 splicers | incl. | **145,700** | CNF CTG |
 
 Price per spindle:
-- **Automatic-doffing sewing-thread winder:** Credit Ocean ≈ $2,075 FOB, Dingming $3,000 CFR, Tangshi B $3,000 ex-works.
-- **Soft and hard winders together:** Dingming is the lowest compliant CFR offer at $27,000. Tangshi is $32,880, or $36,680 with splicers and blowers. Charming Star is $35,810 FOB.
+- **Automatic-doffing sewing-thread winder:** Credit Ocean ≈ $2,075 FOB (unverified), Gonghong $2,328 CIF, Dingming $3,000 CFR, Tangshi B $3,000 ex-works.
+- **Soft and hard winders together:** Dingming $27,000 CFR and Gonghong $27,747 CIF are effectively level. Tangshi is $32,880, or $36,680 with splicers and blowers. Charming Star is $35,810 FOB.
+- **Full scope with automatic doffing:** Gonghong $139,467 CIF is the lowest compliant total. Dingming is $177,000 CFR (+27%) and Tangshi B is $191,180 CFR (+37%). Gonghong's price is valid only for the quoted quantities.
 
 ---
 
@@ -166,7 +193,7 @@ Price per spindle:
 | Vendor | Shortfalls |
 |---|---|
 | **Charming Star** | • No automatic doffing or feeding on the sewing-thread machine (option, unpriced). • Spool winder speed ≤150 m/min. • Soft and hard winders reach 1,000 m/min only "without loading"; 600–800 m/min in practice. • Density and package size not guaranteed ("based on client request"). • Soft take-up range 170–175 mm does not fit the 160.4 mm tube; traverse 152 mm is longer than the 143 mm tube body. • CMcw-600C is quoted "for cotton"; filament capability is unproven. • FOB price, not CFR. • No warranty, spares list or packing data for the winders. • 50% TT advance. • Declined to give a point-by-point list of deviations. |
-| **Gonghong** | • No machine prices, Incoterm, payment terms or lead time. • D4 answered NO without a remark; checklist header (company, date, offer ref.) blank. • Traverse 147 mm, longer than the 143 mm tube body. • Datasheet sewing speed "1,000 rpm" against our "1,400 rpm". • No on-site installation; remote and video support only. • Air splicers and electronic yarn clearers are extra, unpriced. |
+| **Gonghong** | • **Offer validity 10 days, lapsed 20 October 2026.** • Payment 30% TT deposit and 70% before shipment; no L/C. • Delivery 60 days. • Quote and datasheet disagree: 220/380 V vs 400 V ±10%, 60 W vs 100 W per spindle, disc tensioner only vs spring pressure balance and electric waxing. • No blower-cleaner or air splicer in the quoted price; electronic yarn clearers extra. • Soft and hard winders come as 18 separate single-sided 6-spindle sets (check floor space and controls). • D4 answered NO without a remark; checklist header blank. • Traverse 147 mm, longer than the 143 mm tube body. • No on-site installation; remote and video support only. |
 | **Tangshi** | • Soft winder **not suitable for filament polyester** (B2 = NO). • Practical speed about 800 m/min (cotton) and 600 m/min (fibre). • Datasheet bobbin is 6″ (170 mm) while our soft tube is 160.4 mm; traverse 147 / 152 mm. • Option A sewing machine has no automatic doffing. • Automatic winder take-up Ø100 mm maximum. • No spares list or prices, no videos, no gross weight or volume. • Warranty "single shift basis". • Price may change within the validity period. |
 | **Milhan** | • **Soft and sewing-thread machines not offered.** • Hard winder 200–900 m/min, below 1,000 m/min. • EXW, not CFR. • Cash payment. • Electronics warranty 6 months. • Validity expired 16 October 2026. • Requires the buyer to host vendor demonstrations. • Checklist unsigned and inconsistent with the quotation. |
 | **Credit Ocean** | • No model numbers, specifications or datasheets. • No freight, lead time, payment terms, warranty, packing or spares. • Unsigned checklist with no remarks. • Spindles per unit given as 6, then 4. • "4-inch bobbin type" against our 114 mm (≈4.5″) bobbin. • One option appears to be a line-shaft winder. • Video link not received. |
@@ -179,7 +206,7 @@ Price per spindle:
 
 | Vendor | Exceeds requirement in |
 |---|---|
-| **Gonghong** | • Soft and hard winders up to **1,100 m/min** (required 1,000). • Maximum package **250 mm** (required 160 / 180 mm). • **400 V ±10%** supply covers the whole 380–440 V band. • GH018-A line speed up to **1,200 m/min** with **±0.5%** length accuracy and Ø140 mm take-up. • Computer anti-patterning and spring pressure-balanced density. • Priced spares lists and a full packing list. |
+| **Gonghong** | • **Lowest compliant full-scope price**: USD 139,467 **CIF**, so insurance is included as well as freight. • Soft and hard winders up to **1,100 m/min** (required 1,000). • Maximum package **250 mm** (required 160 / 180 mm). • Hard winder takes cones from 3°30′ up to 9°15′. • GH018-A with **doffing, automatic tuck-in** and heated silicone oiling; line speed up to **1,200 m/min** with **±0.5%** length accuracy and Ø140 mm take-up. • Low spindle power (60 W in the quote). • Signed and stamped quotation, priced spares lists and a full packing list. |
 | **Dingming** | • **50 heads** on the automatic winder (required 48). • **2-year warranty** (others 1 year). • **30-day** delivery. • Automatic winder up to **1,200 m/min**, 63–152 mm traverse, up to 3,300 D. • Soft density adjustable 0.2–0.4 g/cm³. • Free spares kit. • Recent Dhaka reference installation. |
 | **Tangshi** | • **Mitsubishi** inverters and **NSK** bearings. • Packages up to 250 mm. • Automatic winder up to **1,200 m/min** with electronic tension per spindle set on the HMI. • Signed and sealed compliance declaration. • Quoted "without commission and negotiation margin". |
 | **Taihe** | • **Precision soft winder** with programmable density and package build, traverse **147–250 mm** variable, packages up to **250 mm / 2 kg**. This is the best technology offered for dye packages, especially filament and spun polyester. • Air splicer and blower included on the hard winder. |
@@ -197,7 +224,7 @@ Price per spindle:
 2. **Hard-package parameters do not reconcile** (Appendix A2). 150 / 180 mm × 155 mm at 1 kg works out to about 0.34 g/cm³. At the target 0.40–0.50 g/cm³ the same package weighs 1.18–1.48 kg. The sheet already marks this figure "confirm".
 3. **Traverse.** Every offer uses a 147–152 mm traverse, but the soft tube body is 143.00 mm. Ask for a ≤140 mm drum or traverse setting so yarn does not run onto the 10.40 mm and 7.00 mm stepped ends that nest on the dye carrier.
 4. **Sewing-thread speed.** "1,400 rpm" is ambiguous. At the bobbin's 28–80 mm diameters it equals only 120–350 m/min, while modern automatic winders run 1,000–1,200 m/min, which is about 10,000–11,600 rpm on the core. Restate the requirement in m/min, for example at least 1,000 m/min.
-5. **Voltage.** The site supply is 415 V 3-ph and the RFQ allows up to 440 V. Machines rated 380 V ±10% (342–418 V) are at the limit at 415 V and out of tolerance at 440 V. Ask each vendor to confirm 415 V operation (Gonghong's 400 V ±10% already covers this) or to include a transformer or AVR.
+5. **Voltage.** The site supply is 415 V 3-ph and the RFQ allows up to 440 V. Machines rated 380 V ±10% (342–418 V) are at the limit at 415 V and out of tolerance at 440 V. Ask each vendor to confirm 415 V operation or to include a transformer or AVR. Gonghong's datasheet says 400 V ±10%, but its quotation says 220 or 380 V.
 6. **Corrected soft-bobbin drawing.** Send the corrected drawing (stepped diameters 54.70 / 49.60 / 43.15 at the bottom and 43.15 / 48.80 / 52.90 at the top) to every vendor. So far only Charming Star has received it.
 7. **Sample tubes and yarn, and a factory acceptance test.** Ship sample soft, hard and sewing tubes and yarn to the shortlisted vendors. Require a video-recorded trial before shipment showing the measured package density, weight and dimensions and a full automatic doffing cycle.
 8. **Common terms.** Request a signed 21-line checklist, a best-and-final CFR Chittagong price, L/C at sight (consider holding 10% against commissioning), the lead time, the warranty start (from commissioning, not invoice), installation cost and HS codes.
@@ -207,7 +234,7 @@ Price per spindle:
 | Vendor | Information still required |
 |---|---|
 | **Dingming** | • Videos of DM0702-SF, DM0702-TH and DM0605 running; a visit to the Dhaka installation (customer name and contact). • Re-submit the 21-line checklist, including the density figures. • Working speed for 50–300 D filament PES. • Traverse ≤143 mm on the soft winder. • Doffing cycle time and magazine capacity. • Installation and commissioning terms and cost. • Packing list (gross and net weight, CBM, containers). • Priced 2-year spares list. • Whether 2 sets of 25 heads (5 units of 5) suit our layout. |
-| **Gonghong** | • **Unit and total CFR Chittagong prices for all three machines** (GH019-SA semi-auto as an alternative). • Payment terms, lead time and validity. • Remark on D4. • Completed checklist header. • Prices for air splicers and electronic yarn clearers. • On-site commissioning option and cost. • Bangladesh or South Asia references (the installation photo suggests one). • Traverse ≤143 mm. |
+| **Gonghong** | • **Renew or extend the offer** (validity lapsed 20 Oct 2026) and confirm the prices still stand. • L/C at sight instead of 30% / 70% TT. • Confirm when the 60-day delivery starts. • Confirm the supply voltage: 220/380 V in the quote vs 400 V ±10% in the datasheet; 415 V operation. • Installed power per spindle: 60 W in the quote vs 100 W in the datasheet. • Whether the spring pressure-balance system, electric waxing (hard winder) and blower-cleaner are included, or prices for them and for air splicers and yarn clearers. • 6-spindle single-sided sets (8 soft + 10 hard) vs 12-spindle double-sided sets: floor space, controls and price. • Whether GH019-SA has automatic doffing (GH018-A is the compliant choice). • Remark on D4; completed checklist header. • On-site commissioning option and cost. • Bangladesh or South Asia references (the installation photo suggests one). • Traverse ≤143 mm. |
 | **Tangshi** | • Confirm Option B (fully automatic) as the base offer and Option A's exact functions. • How the 160.4 mm soft tube fits a 6″ (170 mm) holder. • Traverse ≤143 mm. • Whether a filament-capable soft winder is available. • Warranty for multi-shift working. • Remove the price-variation clause. • Spares list with prices. • Gross weight and CBM. • Videos. |
 | **Taihe** | • **Automatic doffing and feeding version of the sewing-thread winder** (e.g. the fully automatic model) with price. • Signed 21-line checklist. • Validity. • Packing list. • Itemised spares. • Whether TH-11A-1 traverse can be set below 147 mm. • A double-sided or shorter layout for the soft winder (18.1 m). |
 | **Charming Star** | • A CFR price, not FOB plus an estimate. • A priced automatic-doffing sewing-thread machine. • Guaranteed working speeds under load. • Soft holder for 160.4 mm tubes. • Warranty, spares and packing. • Formal list of deviations (refused on 8 Oct). |
@@ -220,7 +247,7 @@ Price per spindle:
 
 | Rank | Vendor | Technical /10 | Comment |
 |:-:|---|:-:|---|
-| **1** | **Foshan Gonghong** | **9.00** | The most complete and consistent technical package. All three machines meet or beat the requirement; the only open point is the ambiguous 1,400 rpm line. Best electrical match (400 V ±10%). |
+| **1** | **Foshan Gonghong** | **8.90** | The most complete technical package. All three machines meet or beat the requirement, and the quotation confirms doffing and tuck-in on the GH018-A. Open points are the ambiguous 1,400 rpm line and the quote/datasheet differences on voltage, spindle power and tensioning. |
 | 2= | Ningbo Dingming | 8.40 | Fully compliant scope with a strong automatic winder (50 heads, 1,200 m/min). Practical soft-winder speed is lower and documentation is thinner. |
 | 2= | Jiangsu Tangshi (Option B) | 8.40 | Strong automatic winder and branded components. Soft winder excludes filament polyester. |
 | 4 | Zhejiang Taihe | 7.80 | **Best soft winder** (precision, programmable density), but no automatic doffing on the sewing-thread machine. |
@@ -229,9 +256,9 @@ Price per spindle:
 | 7 | Ningbo Credit Ocean | 3.60 | No technical data. |
 | 8 | Milhan Makine | 3.00 | Hard winder only. |
 
-**Conclusion.** On technical grounds alone, **Foshan Gonghong** is the best offer. On combined technical and commercial value, **Ningbo Dingming** currently leads, ahead of Jiangsu Tangshi (Option B). If package-dyeing quality on **filament polyester** matters a lot, consider a **split award**: Taihe's TH-11A-1 precision soft winder, with the hard and sewing-thread machines from Gonghong, Dingming or Tangshi.
+**Conclusion.** **Foshan Gonghong** is the best offer both on technical grounds and on combined value (8.40). It also has the lowest compliant full-scope price, USD 139,467 CIF. **Ningbo Dingming** (8.10) is a strong second, with better terms: L/C at sight, 30-day delivery, a 2-year warranty and a valid offer. Jiangsu Tangshi (Option B) is third. Before awarding Gonghong, get its offer renewed, ask for L/C payment, and settle the quote/datasheet differences. Use Dingming's terms as leverage. If package-dyeing quality on **filament polyester** matters a lot, consider a **split award**: Taihe's TH-11A-1 precision soft winder, with the hard and sewing-thread machines from Gonghong, Dingming or Tangshi.
 
-**Recommended next step.** Send the Section 7.1 clarification letter to **Gonghong, Dingming, Tangshi and Taihe**. Ask each for a best-and-final CFR offer with a signed checklist within 7 days. Visit Dingming's Dhaka installation, then re-score with Section 2's rules before issuing a PO.
+**Recommended next step.** Send the Section 7.1 clarification letter to **Gonghong, Dingming, Tangshi and Taihe**. Ask each for a best-and-final CFR offer with a signed checklist within 7 days. Visit Dingming's Dhaka installation and ask Gonghong for a Bangladesh or South Asia reference. Then re-score with Section 2's rules before issuing a PO.
 
 ---
 
@@ -262,7 +289,7 @@ On a 143 mm traverse, a 1 kg package needs Ø181 mm at 0.30 g/cm³, Ø169 mm at 
 | Vendor | Documents |
 |---|---|
 | Charming Star | Quotation BD261008SA (8 Oct 2026); signed checklist (12 Oct); catalogue pp. 7, 8, 24, 25; cone photos (A, H, Y); 5 videos; email thread to 21 Oct |
-| Gonghong | GH018-S, GH018-M and GH018-A datasheets; signed checklist; packing list; spare-parts and accessory lists (priced and unpriced); GH018-A video and photo; email thread to 12 Oct |
+| Gonghong | **Quotation GH-XP26-14840 (10 Oct 2026, signed and stamped; supplied separately, not in the zip)**; GH018-S, GH018-M and GH018-A datasheets; signed checklist; packing list; spare-parts and accessory lists (priced and unpriced); GH018-A video and photo; email thread to 12 Oct |
 | Tangshi | Quotations 26INV1004 (M&S and M&S&O); TS008S and TS008M data sheets; fully automatic winder sheet; signed and sealed checklist 26TSBD1011; email thread to 13 Oct |
 | Milhan | FSM-01 offer (9 Oct, 1-week validity); unsigned checklist (12 Oct); export reference list; photos and video; email thread to 13 Oct |
 | Credit Ocean | Unsigned checklist; email thread with prices (16 Oct) and 3 photos; video link not received |

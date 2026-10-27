@@ -91,7 +91,7 @@ h2 { font-size: 25px; font-weight: 720; font-stretch: 88%; }
 h3 { font-size: 18px; font-weight: 700; font-stretch: 90%; }
 
 /* Controls */
-.controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 22px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px 18px; align-items: start; }
+.controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 22px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px 18px; align-items: start; }
 .ctl { display: grid; gap: 8px; min-width: 0; }
 .ctl > .lab { font: 600 12px/1.3 var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
 .seg { display: inline-flex; border: 1px solid var(--rule-strong); border-radius: 7px; overflow: hidden; width: max-content; max-width: 100%; flex-wrap: wrap; }
@@ -317,6 +317,7 @@ tr.excluded td.keep { opacity: 1; }
       <span>Evaluated <b>27 October 2026</b></span>
       <span>Price basis <b>CFR Chittagong, Incoterms 2020</b></span>
       <span>Offers <b>7</b></span>
+      <span>Revision <b>2</b> · Gonghong quotation added</span>
     </div>
     <div class="scope" aria-label="Required machines">
       <span>Soft winder <b>48</b> spindles · 160 mm, 1 kg dye package</span>
@@ -327,14 +328,14 @@ tr.excluded td.keep { opacity: 1; }
 
   <div class="verdicts">
     <div class="verdict">
-      <span class="k">Best overall value</span>
-      <span class="v">Ningbo Dingming <span class="num">8.10</span></span>
-      <span class="d">Full scope with auto doffing at USD 177,000 CFR, 2-year warranty, 30-day delivery.</span>
+      <span class="k">Best overall and technical</span>
+      <span class="v">Foshan Gonghong <span class="num">8.40</span></span>
+      <span class="d">Lowest compliant price: USD 139,467 CIF with auto doffing. Technical 8.90. Offer lapsed 20 Oct; ask to renew.</span>
     </div>
     <div class="verdict">
-      <span class="k">Best on technical grounds</span>
-      <span class="v">Foshan Gonghong <span class="num">9.00</span></span>
-      <span class="d">Most complete data on all three machines, but no machine prices sent yet.</span>
+      <span class="k">Runner-up</span>
+      <span class="v">Ningbo Dingming <span class="num">8.10</span></span>
+      <span class="d">USD 177,000 CFR with better terms: L/C at sight, 30-day delivery, 2-year warranty.</span>
     </div>
     <div class="verdict">
       <span class="k">Best soft winder</span>
@@ -365,10 +366,6 @@ tr.excluded td.keep { opacity: 1; }
         <span class="wout" id="wout"><span class="num">60 %</span> technical · <span class="num">40 %</span> commercial</span>
       </div>
       <div class="ctl">
-        <span class="lab">Assumptions</span>
-        <label class="check" for="whatif"><input type="checkbox" id="whatif"><span>Gonghong prices in line with Dingming and Tangshi<small>Uses an indicative commercial score of 7.45 until real prices arrive.</small></span></label>
-      </div>
-      <div class="ctl">
         <span class="lab">Filter</span>
         <label class="check" for="needauto"><input type="checkbox" id="needauto"><span>Exclude offers without automatic doffing<small>Excluded offers stay listed, greyed, without a rank.</small></span></label>
         <button type="button" class="reset" id="reset">Reset to report settings</button>
@@ -386,7 +383,7 @@ tr.excluded td.keep { opacity: 1; }
         <tbody id="rank-body"></tbody>
       </table>
     </div>
-    <p class="note" id="rank-note"><b>Gonghong</b> sent full technical data but no machine prices, so most of its commercial lines score zero. Tick the assumption above to see where it would rank with competitive CFR prices.</p>
+    <p class="note" id="rank-note"><b>Gonghong and Dingming share a commercial score of 7.65.</b> Gonghong is 21% cheaper for the full scope; Dingming has better terms. Gonghong's higher technical score keeps it first at every weighting.</p>
   </section>
 
   <section aria-labelledby="h-tech">
@@ -398,7 +395,7 @@ tr.excluded td.keep { opacity: 1; }
       <table>
         <thead><tr><th scope="col">Rank</th><th scope="col">Vendor</th><th scope="col" class="n">Technical</th><th scope="col">Why</th></tr></thead>
         <tbody>
-          <tr><td class="num"><b>1</b></td><td><b>Foshan Gonghong</b></td><td class="n"><b>9.00</b></td><td>The most complete and consistent data. All three machines meet or beat the requirement. Only the ambiguous 1,400 rpm line is open. Its 400 V ±10% rating covers the full 380–440 V range.</td></tr>
+          <tr><td class="num"><b>1</b></td><td><b>Foshan Gonghong</b></td><td class="n"><b>8.90</b></td><td>The most complete technical package. All three machines meet or beat the requirement, and the quotation confirms doffing and tuck-in on the GH018-A. Open points: the 1,400 rpm line, and quote vs datasheet differences on voltage, spindle power and tensioning.</td></tr>
           <tr><td class="num">2=</td><td>Ningbo Dingming</td><td class="n">8.40</td><td>Full scope with a strong automatic winder (50 heads, 1,200 m/min). Lower practical soft-winder speed and thinner documentation.</td></tr>
           <tr><td class="num">2=</td><td>Jiangsu Tangshi, Option B</td><td class="n">8.40</td><td>Strong automatic winder and branded components. Soft winder excludes filament polyester.</td></tr>
           <tr><td class="num">4</td><td>Zhejiang Taihe</td><td class="n">7.80</td><td>Best soft winder (precision, programmable density). No automatic doffing on the thread winder.</td></tr>
@@ -481,7 +478,8 @@ tr.excluded td.keep { opacity: 1; }
           <tr><td>Jiangsu Tangshi, B</td><td class="n">14,880</td><td class="n">18,000</td><td class="n">144,000<br><span class="muted small">auto, 2 × 24</span></td><td class="n">6,200</td><td class="n">8,100</td><td class="n"><b>191,180</b></td><td>CFR Chittagong</td></tr>
           <tr><td>Jiangsu Tangshi, A</td><td class="n">14,880</td><td class="n">18,000</td><td class="n">81,600<br><span class="muted small">no auto doffing</span></td><td class="n">6,200</td><td class="n">8,100</td><td class="n"><b>128,780</b></td><td>CFR Chittagong</td></tr>
           <tr><td>Zhejiang Taihe</td><td class="n">44,500<br><span class="muted small">precision</span></td><td class="n">18,800</td><td class="n">79,200<br><span class="muted small">no auto doffing</span></td><td class="n">3,200</td><td class="n">incl.</td><td class="n"><b>145,700</b></td><td>CNF Chattogram</td></tr>
-          <tr><td>Foshan Gonghong</td><td class="n">–</td><td class="n">–</td><td class="n">–</td><td class="n">spares 3,695</td><td class="n">–</td><td class="n"><b>not quoted</b></td><td>–</td></tr>
+          <tr><td><b>Foshan Gonghong</b></td><td class="n">12,332<br><span class="muted small">8 × 6 sp</span></td><td class="n">15,415<br><span class="muted small">10 × 6 sp</span></td><td class="n">111,720<br><span class="muted small">GH018-A auto, 12 × 4</span></td><td class="n">spares 3,695 opt.</td><td class="n">incl. 7,347</td><td class="n"><b>139,467</b></td><td>CIF Chattogram</td></tr>
+          <tr><td>Foshan Gonghong, alt.</td><td class="n">12,332</td><td class="n">15,415</td><td class="n">72,680<br><span class="muted small">GH019-SA, no auto doffing stated</span></td><td class="n">–</td><td class="n">incl.</td><td class="n"><b>100,427</b></td><td>CIF Chattogram</td></tr>
           <tr><td>Charming Star</td><td class="n">16,950</td><td class="n">18,860</td><td class="n">11,120<br><span class="muted small">manual spool winder</span></td><td class="n">splicers incl.</td><td class="n">≈6,800 est.</td><td class="n"><b>46,930</b></td><td>FOB Shanghai</td></tr>
           <tr><td>Credit Ocean, opt. 1</td><td class="n">10,560</td><td class="n">11,600</td><td class="n">99,600<br><span class="muted small">auto, 12 × 4</span></td><td class="n">–</td><td class="n">not quoted</td><td class="n"><b>121,760</b></td><td>FOB Ningbo</td></tr>
           <tr><td>Credit Ocean, opt. 2</td><td class="n">6,600</td><td class="n">8,000</td><td class="n">99,600</td><td class="n">–</td><td class="n">not quoted</td><td class="n"><b>114,200</b></td><td>FOB Ningbo</td></tr>
@@ -489,7 +487,7 @@ tr.excluded td.keep { opacity: 1; }
         </tbody>
       </table>
     </div>
-    <p class="note">Tangshi's totals include USD 6,200 of optional splicers and blowers. Per spindle, automatic thread winders cost about USD 2,075 FOB (Credit Ocean), 3,000 CFR (Dingming) and 3,000 ex-works (Tangshi). For the soft and hard winders together, Dingming is the lowest compliant CFR offer at USD 27,000.</p>
+    <p class="note"><b>Gonghong's USD 139,467 CIF is the lowest compliant full-scope price:</b> Dingming is 27% higher and Tangshi B 37% higher. Gonghong's prices hold only for the quoted quantities. Tangshi's totals include USD 6,200 of optional splicers and blowers. Per spindle, automatic thread winders cost about USD 2,075 FOB (Credit Ocean, unverified), 2,328 CIF (Gonghong), 3,000 CFR (Dingming) and 3,000 ex-works (Tangshi). For the soft and hard winders alone, Dingming (27,000 CFR) and Gonghong (27,747 CIF) are level.</p>
   </section>
 
   <section aria-labelledby="h-prof" id="profiles">
@@ -500,6 +498,49 @@ tr.excluded td.keep { opacity: 1; }
     </div>
 
     <div class="tabs no-print" role="tablist" aria-label="Vendors" id="tabs"></div>
+
+    <article class="vp" id="vp-GH" data-v="GH" role="tabpanel" aria-labelledby="tab-GH">
+      <div class="vp-head"><span class="vcode">GH</span><div><h3>Foshan Gonghong Textile Machinery</h3><span class="vsub">China · manufacturer · quotation GH-XP26-14840 of 10 Oct 2026, signed and stamped</span></div><div class="pills" data-pills="GH"></div></div>
+      <dl class="terms">
+        <div class="wide"><dt>Models</dt><dd>GH018-S soft, 8 single-sided sets × 6 spindles · GH018-M hard, 10 sets × 6 spindles · GH018-A fully automatic tuck-in thread winder, 12 sets × 4 spindles. Alternative: GH019-SA automatic A-cone winder, 12 sets × 4 spindles / 8 cones.</dd></div>
+        <div><dt>Price</dt><dd>USD 139,467 CIF Chattogram (FOB Guangzhou 132,120)</dd></div>
+        <div><dt>Payment</dt><dd>30% TT deposit, 70% before shipment</dd></div>
+        <div><dt>Delivery</dt><dd>60 days</dd></div>
+        <div><dt>Warranty</dt><dd>1 year</dd></div>
+        <div><dt>Validity</dt><dd>10 days; lapsed 20 Oct 2026</dd></div>
+        <div><dt>Installation</dt><dd>Remote and video support, reply in 12–24 h; no on-site technician</dd></div>
+        <div class="wide"><dt>Spares, packing</dt><dd>Priced spares: USD 417 for soft and hard, USD 3,278 for 12 × GH018-A. Packing: 21 packages, two 40HQ, 9,900 kg net, 10,950 kg gross, 69.5 m³.</dd></div>
+      </dl>
+      <div class="lists">
+        <div class="ex"><h4>Exceeds our requirement</h4><ul>
+          <li>Lowest compliant full-scope price, and CIF: insurance included</li>
+          <li>Soft and hard winders at 300–1,100 m/min</li>
+          <li>Packages up to 250 mm; hard cones 3°30′ to 9°15′</li>
+          <li>GH018-A with doffing, automatic tuck-in and heated silicone oiling; up to 1,200 m/min, ±0.5% length accuracy</li>
+          <li>Low spindle power, 60 W in the quote</li>
+          <li>Only vendor with priced spares and a full packing list</li>
+        </ul></div>
+        <div class="sh"><h4>Falls short</h4><ul>
+          <li>Offer validity 10 days, lapsed 20 Oct 2026</li>
+          <li>30% / 70% TT payment, no L/C; 60-day delivery</li>
+          <li>Quote and datasheet differ: 220/380 V vs 400 V ±10%, 60 W vs 100 W, disc tensioner vs spring balance and waxing</li>
+          <li>No blower-cleaner or splicer in the price</li>
+          <li>18 separate 6-spindle sets for soft and hard</li>
+          <li>Answered NO to 1,400 rpm without a remark; traverse 147 mm</li>
+          <li>No on-site commissioning</li>
+        </ul></div>
+        <div class="ask"><h4>Ask before the next round</h4><ul>
+          <li>Renew the offer and confirm prices still stand</li>
+          <li>L/C at sight instead of TT</li>
+          <li>Supply voltage and 415 V operation; installed power per spindle</li>
+          <li>Whether spring balance, waxing and blower-cleaner are included; prices for splicers and yarn clearers</li>
+          <li>12-spindle double-sided sets instead of 6-spindle sets</li>
+          <li>Whether GH019-SA has automatic doffing</li>
+          <li>On-site commissioning cost; South Asia references; traverse of 140 mm or less</li>
+        </ul></div>
+      </div>
+      <div class="scorebars" data-bars="GH"></div>
+    </article>
 
     <article class="vp" id="vp-DM" data-v="DM" role="tabpanel" aria-labelledby="tab-DM">
       <div class="vp-head"><span class="vcode">DM</span><div><h3>Ningbo Dingming Machinery</h3><span class="vsub">China · manufacturer with an import-export arm · quotes of 9 Oct 2026</span></div><div class="pills" data-pills="DM"></div></div>
@@ -622,47 +663,6 @@ tr.excluded td.keep { opacity: 1; }
       <div class="scorebars" data-bars="TH"></div>
     </article>
 
-    <article class="vp" id="vp-GH" data-v="GH" role="tabpanel" aria-labelledby="tab-GH">
-      <div class="vp-head"><span class="vcode">GH</span><div><h3>Foshan Gonghong Textile Machinery</h3><span class="vsub">China · manufacturer · offer of 11 Oct 2026, checklist of 12 Oct</span></div><div class="pills" data-pills="GH"></div></div>
-      <dl class="terms">
-        <div class="wide"><dt>Models</dt><dd>GH018-S soft (4 × 12) · GH018-M hard (5 × 12) · GH018-A Auto thread winder, 12 × 4 spindles. GH019-SA semi-automatic mentioned, no data.</dd></div>
-        <div><dt>Price</dt><dd>No machine prices sent</dd></div>
-        <div><dt>Payment</dt><dd>Not stated</dd></div>
-        <div><dt>Delivery</dt><dd>Not stated</dd></div>
-        <div><dt>Warranty</dt><dd>1 year</dd></div>
-        <div><dt>Validity</dt><dd>Not applicable</dd></div>
-        <div><dt>Installation</dt><dd>Remote and video support, reply in 12–24 h; no on-site technician</dd></div>
-        <div class="wide"><dt>Spares, packing</dt><dd>Priced spares: USD 417 for soft and hard, USD 3,278 for 12 × GH018-A. Packing: 21 packages, two 40HQ, 9,900 kg net, 10,950 kg gross, 69.5 m³.</dd></div>
-      </dl>
-      <div class="lists">
-        <div class="ex"><h4>Exceeds our requirement</h4><ul>
-          <li>Soft and hard winders up to 1,100 m/min</li>
-          <li>Packages up to 250 mm</li>
-          <li>400 V ±10% covers the whole 380–440 V band</li>
-          <li>GH018-A at 300–1,200 m/min, ±0.5% length accuracy, Ø140 mm take-up</li>
-          <li>Computer anti-patterning; spring-balanced density</li>
-          <li>Only vendor with priced spares and a full packing list</li>
-        </ul></div>
-        <div class="sh"><h4>Falls short</h4><ul>
-          <li>No machine prices, payment terms, lead time or Incoterm</li>
-          <li>Answered NO to 1,400 rpm without a remark</li>
-          <li>Checklist header left blank</li>
-          <li>Traverse 147 mm</li>
-          <li>No on-site commissioning</li>
-          <li>Air splicers and yarn clearers extra, unpriced</li>
-        </ul></div>
-        <div class="ask"><h4>Ask before the next round</h4><ul>
-          <li>Unit and total CFR Chittagong prices for all three machines, and GH019-SA as an alternative</li>
-          <li>Payment terms, lead time, validity</li>
-          <li>A remark for the 1,400 rpm line; complete the checklist header</li>
-          <li>Prices for air splicers and yarn clearers</li>
-          <li>On-site commissioning option and cost</li>
-          <li>Bangladesh or South Asia references</li>
-          <li>Soft traverse of 140 mm or less</li>
-        </ul></div>
-      </div>
-      <div class="scorebars" data-bars="GH"></div>
-    </article>
 
     <article class="vp" id="vp-CS" data-v="CS" role="tabpanel" aria-labelledby="tab-CS">
       <div class="vp-head"><span class="vcode">CS</span><div><h3>Charming Star International</h3><span class="vsub">Taiwan · ships FOB Shanghai · quotation BD261008SA of 8 Oct 2026</span></div><div class="pills" data-pills="CS"></div></div>
@@ -840,6 +840,7 @@ tr.excluded td.keep { opacity: 1; }
 
   <footer class="foot">
     <p>Sources: every file in the seven vendor zip files (quotations, datasheets, catalogue pages, checklists, packing and spares lists, emails, photos). Videos were noted as supplied but not scored frame by frame.</p>
+    <p>Revision 2: Gonghong's quotation GH-XP26-14840 was not in its zip file and was supplied separately; Gonghong is re-scored with it. No other vendor's scores changed.</p>
     <p>Winding_Machines_Combined_Specification.pdf was not in the repository. Requirements were taken from the RFQ text, the 21-line Technical Compliance Checklist and the corrected soft bobbin drawing.</p>
   </footer>
 </div>
@@ -857,7 +858,7 @@ tr.excluded td.keep { opacity: 1; }
   var COMM = [["P", "Price for full scope", 4], ["I", "CFR price basis", 1], ["Pay", "Payment terms", 1], ["L", "Lead time, validity", 1], ["W", "Warranty, after-sales", 2], ["Sp", "Spares, packing data", 1]];
 
   var V = {
-    DM: { short: "Dingming", name: "Ningbo Dingming", sub: "DM0702-SF · DM0702-TH · DM0605 auto", auto: "y", price: "177,000", basis: "CFR Chittagong", verdict: "Best value · shortlist", tone: "good",
+    DM: { short: "Dingming", name: "Ningbo Dingming", sub: "DM0702-SF · DM0702-TH · DM0605 auto", auto: "y", price: "177,000", basis: "CFR Chittagong", verdict: "Strong alternative · shortlist", tone: "good",
       s: { S1: .5, S2: .6, S3: .6, S4: .35, S5: .4, H1: .5, H2: .5, H3: .4, H4: .4, W1: .5, W2: 1, W3: .45, W4: .5, W5: .45, B: .3, E: .4, D: .55 },
       c: { P: 2.75, I: 1, Pay: .9, L: 1, W: 1.5, Sp: .5 } },
     TS: { short: "Tangshi B", name: "Jiangsu Tangshi", sub: "Option B · TS008S · TS008M · TS008O auto", auto: "y", price: "191,180", basis: "CFR Chittagong", verdict: "Shortlist", tone: "good",
@@ -866,9 +867,9 @@ tr.excluded td.keep { opacity: 1; }
     TH: { short: "Taihe", name: "Zhejiang Taihe", sub: "TH-11A-1 · TH-8H · TH-15A", auto: "n", price: "145,700", basis: "CNF Chattogram, no auto doffing", verdict: "Shortlist if auto doffing added", tone: "warn",
       s: { S1: .5, S2: .75, S3: .75, S4: .4, S5: .5, H1: .5, H2: .5, H3: .4, H4: .5, W1: .5, W2: 0, W3: .5, W4: .45, W5: .4, B: .25, E: .45, D: .45 },
       c: { P: 2, I: 1, Pay: .9, L: .7, W: 1.3, Sp: .2 } },
-    GH: { short: "Gonghong", name: "Foshan Gonghong", sub: "GH018-S · GH018-M · GH018-A auto", auto: "y", price: "–", basis: "Machines not priced", verdict: "Best technical · get prices", tone: "info",
-      s: { S1: .5, S2: .6, S3: .65, S4: .5, S5: .45, H1: .5, H2: .5, H3: .45, H4: .5, W1: .5, W2: 1, W3: .45, W4: .4, W5: .5, B: .3, E: .5, D: .7 },
-      c: { P: 0, I: 0, Pay: 0, L: 0, W: 1.1, Sp: 1 } },
+    GH: { short: "Gonghong", name: "Foshan Gonghong", sub: "GH018-S · GH018-M · GH018-A auto", auto: "y", price: "139,467", basis: "CIF Chattogram, offer lapsed 20 Oct", verdict: "Best overall · shortlist", tone: "good",
+      s: { S1: .5, S2: .6, S3: .65, S4: .5, S5: .4, H1: .5, H2: .5, H3: .4, H4: .5, W1: .5, W2: 1, W3: .45, W4: .4, W5: .5, B: .3, E: .45, D: .75 },
+      c: { P: 3.75, I: 1, Pay: .4, L: .4, W: 1.1, Sp: 1 } },
     CS: { short: "Charming Star", name: "Charming Star International", sub: "CMcw-600C · CMcw-600CH · CMsp-2A", auto: "n", price: "46,930", basis: "FOB Shanghai, thread winder non-compliant", verdict: "Not recommended as offered", tone: "bad",
       s: { S1: .5, S2: .4, S3: .35, S4: .25, S5: .45, H1: .5, H2: .45, H3: .3, H4: .3, W1: .4, W2: 0, W3: .35, W4: .15, W5: .3, B: .15, E: .35, D: .55 },
       c: { P: 2, I: .4, Pay: .4, L: .4, W: .2, Sp: .25 } },
@@ -879,11 +880,10 @@ tr.excluded td.keep { opacity: 1; }
       s: { S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, H1: .5, H2: .5, H3: .5, H4: .35, W1: 0, W2: 0, W3: 0, W4: 0, W5: 0, B: .2, E: .45, D: .5 },
       c: { P: .5, I: .1, Pay: .2, L: .3, W: .8, Sp: .1 } }
   };
-  var ORDER = ["DM", "TS", "TH", "GH", "CS", "CO", "MH"];
-  var GH_WHATIF = 7.45;
+  var ORDER = ["GH", "DM", "TS", "TH", "CS", "CO", "MH"];
   var AUTO_TEXT = { y: ["Yes", "y"], n: ["No", "n"], q: ["Claimed", "q"], x: ["Not offered", "n"] };
-  var DEFAULTS = { w: 60, sort: "overall", whatIf: false, needAuto: false, sel: "DM" };
-  var KEY = "wm-bid-eval-v1";
+  var DEFAULTS = { w: 60, sort: "overall", needAuto: false, sel: "GH" };
+  var KEY = "wm-bid-eval-v2";
 
   function sum(obj) { var t = 0; for (var k in obj) t += obj[k]; return Math.round(t * 100) / 100; }
   ORDER.forEach(function (id) { V[id].T = sum(V[id].s); V[id].C = sum(V[id].c); });
@@ -894,14 +894,13 @@ tr.excluded td.keep { opacity: 1; }
     if (saved && typeof saved === "object") {
       if (typeof saved.w === "number" && saved.w >= 0 && saved.w <= 100) state.w = saved.w;
       if (["overall", "tech", "comm"].indexOf(saved.sort) > -1) state.sort = saved.sort;
-      state.whatIf = !!saved.whatIf;
       state.needAuto = !!saved.needAuto;
       if (V[saved.sel]) state.sel = saved.sel;
     }
   } catch (e) { /* storage unavailable: use defaults */ }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignore */ } }
 
-  function comm(id) { return id === "GH" && state.whatIf ? GH_WHATIF : V[id].C; }
+  function comm(id) { return V[id].C; }
   function overall(id) { var w = state.w / 100; return Math.round((w * V[id].T + (1 - w) * comm(id)) * 100) / 100; }
   function metric(id) { return state.sort === "tech" ? V[id].T : state.sort === "comm" ? comm(id) : overall(id); }
   function f2(n) { return n.toFixed(2); }
@@ -928,7 +927,7 @@ tr.excluded td.keep { opacity: 1; }
       }
       var a = AUTO_TEXT[v.auto];
       var c = comm(id);
-      var cTxt = f2(c) + (id === "GH" && state.whatIf ? "*" : "");
+      var cTxt = f2(c);
       rows.push(
         '<tr class="' + (ex ? "excluded" : "") + '">' +
         '<td class="rk">' + (ex ? "–" : rk) + "</td>" +
@@ -945,13 +944,8 @@ tr.excluded td.keep { opacity: 1; }
     });
     document.getElementById("rank-body").innerHTML = rows.join("");
 
-    var note = document.getElementById("rank-note");
-    note.innerHTML = state.whatIf
-      ? "<b>* Gonghong what-if.</b> Its commercial score is set to an indicative 7.45, assuming CFR prices in line with Dingming and Tangshi, L/C payment and a normal lead time. Replace with real figures when its prices arrive."
-      : "<b>Gonghong</b> sent full technical data but no machine prices, so most of its commercial lines score zero. Tick the assumption above to see where it would rank with competitive CFR prices.";
-
     var ps = document.getElementById("print-settings");
-    ps.textContent = "Ranking shown by " + labels[state.sort].toLowerCase() + " score · overall = " + state.w + " % technical + " + (100 - state.w) + " % commercial · Gonghong what-if " + (state.whatIf ? "on (commercial 7.45)" : "off") + " · offers without automatic doffing " + (state.needAuto ? "excluded" : "included") + ".";
+    ps.textContent = "Ranking shown by " + labels[state.sort].toLowerCase() + " score · overall = " + state.w + " % technical + " + (100 - state.w) + " % commercial · offers without automatic doffing " + (state.needAuto ? "excluded" : "included") + ".";
   }
 
   function heat(val, max) {
@@ -989,7 +983,7 @@ tr.excluded td.keep { opacity: 1; }
     COMM.forEach(function (r) {
       h.push('<tr><th scope="row"><span class="code">' + r[0] + "</span>" + esc(r[1]) + '</th><td class="mx-max n">' + r[2].toFixed(2) + "</td>" + cells(function (id) { return V[id].c[r[0]]; }, r[2]) + "</tr>");
     });
-    h.push('<tr class="total"><th scope="row">Commercial total</th><td class="mx-max n">10.00</td>' + cells(comm, 10, function (id) { return id === "GH" && state.whatIf ? "wi" : ""; }) + "</tr>");
+    h.push('<tr class="total"><th scope="row">Commercial total</th><td class="mx-max n">10.00</td>' + cells(comm, 10) + "</tr>");
     h.push('<tr class="total"><th scope="row">Overall · ' + state.w + " / " + (100 - state.w) + '</th><td class="mx-max n">10.00</td>' + cells(overall, 10) + "</tr>");
     h.push("</tbody>");
     document.getElementById("matrix").innerHTML = h.join("");
@@ -1006,7 +1000,7 @@ tr.excluded td.keep { opacity: 1; }
       pills.innerHTML =
         '<div class="pill main"><span>Overall</span><b>' + f2(overall(id)) + "</b></div>" +
         '<div class="pill"><span>Technical</span><b>' + f2(v.T) + "</b></div>" +
-        '<div class="pill"><span>Commercial</span><b>' + f2(comm(id)) + (id === "GH" && state.whatIf ? "*" : "") + "</b></div>";
+        '<div class="pill"><span>Commercial</span><b>' + f2(comm(id)) + "</b></div>";
       var tech = TECH.map(function (g) {
         if (g.max) return bar(g.g, g.rows.reduce(function (t, r) { return t + v.s[r[0]]; }, 0), g.max);
         return g.rows.map(function (r) { return bar(r[1], v.s[r[0]], r[2]); }).join("");
@@ -1034,7 +1028,6 @@ tr.excluded td.keep { opacity: 1; }
     document.querySelectorAll("[data-sort]").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-sort") === state.sort ? "true" : "false"); });
     document.getElementById("w").value = state.w;
     document.getElementById("wout").innerHTML = '<span class="num">' + state.w + ' %</span> technical · <span class="num">' + (100 - state.w) + " %</span> commercial";
-    document.getElementById("whatif").checked = state.whatIf;
     document.getElementById("needauto").checked = state.needAuto;
   }
 
@@ -1052,7 +1045,6 @@ tr.excluded td.keep { opacity: 1; }
     b.addEventListener("click", function () { state.sort = b.getAttribute("data-sort"); renderAll(); });
   });
   document.getElementById("w").addEventListener("input", function (e) { state.w = parseInt(e.target.value, 10) || 0; renderAll(); });
-  document.getElementById("whatif").addEventListener("change", function (e) { state.whatIf = e.target.checked; renderAll(); });
   document.getElementById("needauto").addEventListener("change", function (e) { state.needAuto = e.target.checked; renderAll(); });
   document.getElementById("reset").addEventListener("click", function () { state = Object.assign({}, DEFAULTS); renderAll(); });
 
