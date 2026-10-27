@@ -1,0 +1,1139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Winding Machine Bid Evaluation</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: one A4-width bid sheet. Summary and live controls first, then the score matrix, the rules, prices, one profile per vendor, and the open points. */
+:root {
+  --paper: #F4F5F8;
+  --sheet: #FFFFFF;
+  --ink: #151A2D;
+  --ink-2: #4A5168;
+  --ink-3: #6C7390;
+  --rule: #D9DDE7;
+  --rule-strong: #B4BACB;
+  --indigo: #2E3D9C;
+  --indigo-ink: #FFFFFF;
+  --indigo-soft: #E5E8F7;
+  --good: #1B7351;
+  --good-soft: #DCF0E6;
+  --warn: #8F5600;
+  --warn-soft: #F7EAD2;
+  --bad: #A3241C;
+  --bad-soft: #F8DFDC;
+  --f-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0F121B; --sheet: #161A26; --ink: #E6E8F1; --ink-2: #AFB5C9; --ink-3: #8B91A8;
+    --rule: #2A3043; --rule-strong: #3D445B; --indigo: #95A2F3; --indigo-ink: #10142A; --indigo-soft: #242B4E;
+    --good: #66CBA2; --good-soft: #16342A; --warn: #E6A752; --warn-soft: #3A2C15; --bad: #F3887E; --bad-soft: #401F1C;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0F121B; --sheet: #161A26; --ink: #E6E8F1; --ink-2: #AFB5C9; --ink-3: #8B91A8;
+  --rule: #2A3043; --rule-strong: #3D445B; --indigo: #95A2F3; --indigo-ink: #10142A; --indigo-soft: #242B4E;
+  --good: #66CBA2; --good-soft: #16342A; --warn: #E6A752; --warn-soft: #3A2C15; --bad: #F3887E; --bad-soft: #401F1C;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 15px/1.55 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 64px;
+}
+.wrap { max-width: 1060px; margin: 0 auto; display: grid; gap: 44px; }
+h1, h2, h3, h4 { font-family: var(--f-display); text-wrap: balance; margin: 0; color: var(--ink); }
+p { margin: 0; }
+.num { font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+.muted { color: var(--ink-3); }
+.small { font-size: 13px; }
+
+/* Document head */
+.doc-head { display: grid; gap: 14px; padding-bottom: 22px; border-bottom: 2px solid var(--ink); }
+.eyebrow { font: 600 12px/1.3 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--indigo); }
+h1 { font-size: clamp(30px, 5vw, 46px); font-weight: 760; font-stretch: 82%; line-height: 1.02; letter-spacing: -.01em; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 22px; color: var(--ink-2); font-size: 14px; }
+.meta b { color: var(--ink); font-weight: 600; }
+.scope { display: flex; flex-wrap: wrap; gap: 8px; }
+.scope span { font: 500 13px/1 var(--f-body); padding: 7px 10px; border: 1px solid var(--rule-strong); border-radius: 999px; color: var(--ink-2); background: var(--sheet); }
+.scope b { font-family: var(--f-data); color: var(--ink); font-weight: 600; }
+
+/* Verdict strip */
+.verdicts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.verdict { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 4px; min-width: 0; }
+.verdict .k { font: 600 12px/1.3 var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.verdict .v { font: 720 24px/1.15 var(--f-display); font-stretch: 88%; }
+.verdict .v .num { font-size: 21px; color: var(--indigo); font-weight: 600; }
+.verdict .d { font-size: 13.5px; color: var(--ink-2); }
+
+/* Sections */
+section { display: grid; gap: 16px; min-width: 0; }
+.sec-head { display: grid; gap: 4px; }
+h2 { font-size: 25px; font-weight: 720; font-stretch: 88%; }
+.sec-head p { color: var(--ink-2); max-width: 70ch; }
+h3 { font-size: 18px; font-weight: 700; font-stretch: 90%; }
+
+/* Controls */
+.controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 22px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px 18px; align-items: start; }
+.ctl { display: grid; gap: 8px; min-width: 0; }
+.ctl > .lab { font: 600 12px/1.3 var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.seg { display: inline-flex; border: 1px solid var(--rule-strong); border-radius: 7px; overflow: hidden; width: max-content; max-width: 100%; flex-wrap: wrap; }
+.seg button { font: 500 13.5px/1 var(--f-body); color: var(--ink); background: transparent; border: 0; padding: 9px 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule-strong); }
+.seg button[aria-pressed="true"] { background: var(--indigo); color: var(--indigo-ink); }
+input[type="range"] { width: 100%; accent-color: var(--indigo); margin: 0; }
+.wout { font-size: 13.5px; color: var(--ink-2); }
+.wout .num { color: var(--ink); font-weight: 600; }
+.check { display: grid; grid-template-columns: auto 1fr; gap: 9px; align-items: start; font-size: 14px; color: var(--ink); cursor: pointer; }
+.check input { margin: 3px 0 0; width: 16px; height: 16px; accent-color: var(--indigo); }
+.check small { display: block; color: var(--ink-3); font-size: 12.5px; line-height: 1.4; }
+.reset { font: 500 13.5px/1 var(--f-body); color: var(--indigo); background: transparent; border: 1px solid var(--rule-strong); border-radius: 7px; padding: 9px 12px; cursor: pointer; width: max-content; }
+.reset:hover, .seg button:hover { background: var(--indigo-soft); color: var(--ink); }
+.seg button[aria-pressed="true"]:hover { background: var(--indigo); color: var(--indigo-ink); }
+.print-hint { grid-column: 1 / -1; font-size: 12.5px; color: var(--ink-3); border-top: 1px solid var(--rule); padding-top: 10px; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+
+/* Tables */
+.tw { overflow-x: auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { padding: 9px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--rule); }
+thead th { font: 600 12px/1.3 var(--f-body); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--rule-strong); white-space: nowrap; background: var(--sheet); }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+td.n, th.n { text-align: right; font-family: var(--f-data); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.c, th.c { text-align: center; }
+
+/* Ranking */
+.rank-t td { vertical-align: middle; }
+.rank-t .rk { font: 700 20px/1 var(--f-display); font-stretch: 85%; color: var(--ink); width: 44px; white-space: nowrap; }
+.vbtn { font: 600 14.5px/1.25 var(--f-body); color: var(--ink); background: none; border: 0; padding: 0; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: var(--rule-strong); text-underline-offset: 3px; }
+.vbtn:hover { text-decoration-color: var(--indigo); color: var(--indigo); }
+.vsub { display: block; font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
+.bar { position: relative; height: 12px; min-width: 120px; background: var(--indigo-soft); border-radius: 3px; overflow: hidden; }
+.bar i { position: absolute; inset: 0 auto 0 0; background: var(--indigo); border-radius: 3px; transition: width .35s ease; }
+.bar-cell { width: 26%; }
+.rank-t td.n.hot { font-weight: 600; color: var(--indigo); }
+tr.excluded td { opacity: .45; }
+tr.excluded td.keep { opacity: 1; }
+.price { font-family: var(--f-data); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.price small { display: block; font-family: var(--f-body); color: var(--ink-3); font-size: 12px; white-space: normal; }
+
+.chip { display: inline-block; font: 600 12px/1.25 var(--f-body); padding: 4px 8px; border-radius: 5px; white-space: nowrap; }
+.chip.good { background: var(--good-soft); color: var(--good); }
+.chip.warn { background: var(--warn-soft); color: var(--warn); }
+.chip.bad { background: var(--bad-soft); color: var(--bad); }
+.chip.info { background: var(--indigo-soft); color: var(--indigo); }
+.chip.plain { background: transparent; color: var(--ink-3); border: 1px solid var(--rule-strong); }
+.yn { font: 600 13px/1 var(--f-body); white-space: nowrap; }
+.yn.y { color: var(--good); }
+.yn.n { color: var(--bad); }
+.yn.q { color: var(--warn); }
+.note { font-size: 13px; color: var(--ink-2); max-width: 90ch; }
+.note b { color: var(--ink); }
+
+/* Matrix */
+.mx th, .mx td { padding: 7px 8px; }
+.mx td.cell { text-align: center; font-family: var(--f-data); font-variant-numeric: tabular-nums; font-size: 13px; white-space: nowrap; }
+.mx .code { font-family: var(--f-data); color: var(--ink-3); font-size: 12px; margin-right: 6px; }
+.mx .mx-max { font-family: var(--f-data); color: var(--ink-3); font-size: 12px; white-space: nowrap; }
+.mx tr.sub th, .mx tr.sub td { font-weight: 600; border-top: 1px solid var(--rule-strong); }
+.mx tr.total th, .mx tr.total td { font-weight: 700; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
+.mx tr.grp th { font: 600 12px/1.3 var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: var(--indigo); padding-top: 14px; background: var(--sheet); }
+.mx thead th.vh { text-align: center; white-space: normal; min-width: 76px; }
+.mx thead th.vh b { display: block; font-family: var(--f-data); color: var(--ink); font-size: 13px; letter-spacing: 0; }
+.mx thead th.vh span { display: block; text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 11.5px; }
+.mx .selcol { box-shadow: inset 2px 0 0 var(--indigo), inset -2px 0 0 var(--indigo); }
+.mx .wi { color: var(--warn); }
+
+/* Rubric */
+.rub td:first-child { font-family: var(--f-data); color: var(--ink-3); white-space: nowrap; }
+.rub td.n { color: var(--ink); }
+.rub td { font-size: 13px; }
+.two { display: grid; gap: 22px; }
+
+/* Profiles */
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs button { font: 500 13.5px/1.2 var(--f-body); color: var(--ink); background: var(--sheet); border: 1px solid var(--rule-strong); border-radius: 7px; padding: 8px 11px; cursor: pointer; display: inline-flex; gap: 8px; align-items: baseline; }
+.tabs button b { font-family: var(--f-data); font-size: 12.5px; color: var(--ink-3); }
+.tabs button[aria-pressed="true"] { background: var(--indigo); border-color: var(--indigo); color: var(--indigo-ink); }
+.tabs button[aria-pressed="true"] b { color: var(--indigo-ink); }
+.vp { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 20px 22px; display: grid; gap: 18px; min-width: 0; }
+.vp-bar { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: space-between; }
+.vp-bar .tabs { min-width: 0; }
+@media screen {
+  .wrap.one-at-a-time:not(.printing) .vp:not(.active) { display: none; }
+  .wrap:not(.one-at-a-time):not(.printing) .vp.active { border-color: var(--indigo); box-shadow: 0 0 0 1px var(--indigo); }
+}
+/* Set by the print events, so every profile prints even where the browser keeps screen styles while printing */
+.printing .no-print { display: none !important; }
+.printing .print-only { display: block; }
+.printing .screen-only { display: none !important; }
+.printing .print-ranks.print-only { display: block; }
+.printing.wrap, .printing section, .printing .pr-block { display: block; }
+.printing.wrap > * + *, .printing section > * + * { margin-top: 18px; }
+.printing .pr-block + .pr-block { margin-top: 18px; }
+.printing .scorebars { display: none; }
+.vp-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 16px; align-items: center; }
+.vcode { font: 700 26px/1 var(--f-data); color: var(--indigo); border: 2px solid var(--indigo); border-radius: 6px; padding: 8px 9px; }
+.vp-head h3 { font-size: 23px; font-stretch: 86%; }
+.vp-head .vsub { font-size: 13px; }
+.pills { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.pill { display: grid; gap: 1px; text-align: center; border: 1px solid var(--rule); border-radius: 6px; padding: 6px 10px; min-width: 76px; }
+.pill span { font: 600 11px/1.2 var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.pill b { font: 600 18px/1.2 var(--f-data); font-variant-numeric: tabular-nums; }
+.pill.main { border-color: var(--indigo); }
+.pill.main b { color: var(--indigo); }
+.terms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 26px; margin: 0; }
+.terms div { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--rule); font-size: 13.5px; }
+.terms dt { color: var(--ink-3); font-weight: 500; }
+.terms dd { margin: 0; color: var(--ink); }
+.terms div.wide { grid-column: 1 / -1; }
+.lists { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.lists > div { min-width: 0; display: grid; gap: 8px; align-content: start; }
+.lists h4 { font: 600 12px/1.3 var(--f-body); letter-spacing: .06em; text-transform: uppercase; display: flex; gap: 8px; align-items: center; }
+.lists h4::before { content: ""; width: 10px; height: 10px; border-radius: 2px; background: var(--mk); flex: none; }
+.lists .ex { --mk: var(--good); }
+.lists .sh { --mk: var(--bad); }
+.lists .ask { --mk: var(--indigo); }
+.lists ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 13.5px; }
+.lists li { position: relative; padding-left: 14px; }
+.lists li::before { content: ""; position: absolute; left: 0; top: .62em; width: 6px; height: 6px; border-radius: 1px; background: var(--mk); }
+.scorebars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 28px; border-top: 1px solid var(--rule); padding-top: 14px; }
+.sb { display: grid; gap: 6px; min-width: 0; }
+.sb h4 { font: 600 12px/1.3 var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.sbr { display: grid; grid-template-columns: 150px minmax(0, 1fr) 76px; gap: 10px; align-items: center; font-size: 13px; }
+.sbr .bar { height: 8px; min-width: 0; }
+.sbr .num { text-align: right; font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+
+/* Lists of open points */
+.points { margin: 0; padding: 0; list-style: none; counter-reset: pt; display: grid; gap: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); }
+.points li { counter-increment: pt; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--rule); font-size: 14px; }
+.points li:last-child { border-bottom: 0; }
+.points li::before { content: counter(pt); font: 600 14px/1.5 var(--f-data); color: var(--indigo); }
+.points b { font-weight: 600; }
+.calc { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.calc > div { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.calc h4 { font-size: 15px; font-stretch: 92%; }
+.calc p { font-size: 13.5px; color: var(--ink-2); }
+.calc table { font-size: 12.5px; }
+.calc th, .calc td { padding: 5px 6px; }
+.foot { font-size: 12.5px; color: var(--ink-3); border-top: 1px solid var(--rule); padding-top: 14px; display: grid; gap: 6px; }
+.print-only { display: none; }
+.pr-block { display: grid; gap: 6px; break-inside: avoid; }
+.pr-h { font-size: 15px; font-stretch: 90%; }
+.pr-h span { font: 400 13px/1.3 var(--f-body); color: var(--ink-3); }
+
+@media (max-width: 860px) {
+  .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lists, .calc { grid-template-columns: minmax(0, 1fr); }
+  .scorebars { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 620px) {
+  body { font-size: 14.5px; }
+  .verdicts, .controls, .terms { grid-template-columns: minmax(0, 1fr); }
+  .vp { padding: 16px; }
+  .vp-head { grid-template-columns: auto minmax(0, 1fr); }
+  .pills { grid-column: 1 / -1; justify-content: flex-start; }
+  .sbr { grid-template-columns: 112px minmax(0, 1fr) 70px; }
+  .terms div { grid-template-columns: 96px minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+
+/* A4 print */
+@page { size: A4 portrait; margin: 12mm 11mm 13mm; }
+@media print {
+  :root:not(.x), :root[data-theme] {
+    --paper: #FFFFFF; --sheet: #FFFFFF; --ink: #151A2D; --ink-2: #3F465C; --ink-3: #5F6680;
+    --rule: #D3D7E2; --rule-strong: #A9AFC2; --indigo: #2E3D9C; --indigo-ink: #FFFFFF; --indigo-soft: #E5E8F7;
+    --good: #1B7351; --good-soft: #DCF0E6; --warn: #8F5600; --warn-soft: #F7EAD2; --bad: #A3241C; --bad-soft: #F8DFDC;
+    color-scheme: light;
+  }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { background: #FFFFFF; }
+  body { padding: 0; font-size: 9pt; line-height: 1.42; }
+  .wrap { max-width: none; gap: 7mm; }
+  .no-print { display: none !important; }
+  .print-only { display: block; }
+  .screen-only { display: none !important; }
+  /* Block flow in print: Chrome can overlap grid items that split across pages */
+  .wrap, section, .pr-block { display: block; }
+  .wrap > * + * { margin-top: 7mm; }
+  section > * + * { margin-top: 3.5mm; }
+  .print-ranks.print-only { display: block; }
+  .pr-block + .pr-block { margin-top: 5mm; }
+  .pr-h { margin-bottom: 1.5mm; }
+  .pr-h { font-size: 10.5pt; }
+  .pr-h span { font-size: 7.6pt; }
+  h1 { font-size: 22pt; }
+  h2 { font-size: 13.5pt; }
+  h3 { font-size: 11pt; }
+  .eyebrow, thead th, .lists h4, .sb h4, .verdict .k, .pill span { font-size: 6.8pt; }
+  .meta, .scope span { font-size: 8pt; }
+  .scope span { padding: 3pt 6pt; }
+  .doc-head { gap: 3mm; padding-bottom: 4mm; }
+  .verdict { padding: 3mm 4mm; }
+  .verdict .v { font-size: 12pt; }
+  .verdict .v .num { font-size: 11pt; }
+  .verdict .d, .note, .sec-head p { font-size: 8pt; }
+  .tw { overflow: visible; border-radius: 0; }
+  table { font-size: 7.6pt; }
+  th, td { padding: 1.6mm 1.8mm; }
+  .mx th, .mx td { padding: 1.1mm 1.4mm; }
+  .mx td.cell, .mx .code, .mx .mx-max { font-size: 7.2pt; }
+  .mx thead th.vh { min-width: 0; }
+  .mx thead th.vh b { font-size: 7.6pt; }
+  .mx thead th.vh span { font-size: 6.4pt; }
+  .mx .selcol { box-shadow: none; }
+  .rub td { font-size: 7.2pt; }
+  .rank-t .rk { font-size: 12pt; width: auto; }
+  .vbtn { font-size: 8.4pt; text-decoration: none; }
+  .vsub, .price small { font-size: 6.8pt; }
+  .bar { min-width: 0; height: 3mm; }
+  .bar-cell { width: 22%; }
+  .chip { font-size: 6.8pt; padding: 1pt 4pt; white-space: normal; }
+  .yn { font-size: 7.4pt; }
+  thead { display: table-header-group; }
+  tr, .verdict, .points li, .calc > div { break-inside: avoid; }
+  .pb { break-before: page; }
+  .vp { display: grid; break-inside: avoid; padding: 4mm 5mm; gap: 3mm; border-color: var(--rule-strong); }
+  .vp + .vp { margin-top: 4mm; }
+  .vcode { font-size: 13pt; padding: 2mm; }
+  .vp-head h3 { font-size: 12.5pt; }
+  .pill { padding: 1mm 2.5mm; min-width: 0; }
+  .pill b { font-size: 10pt; }
+  .terms { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 6mm; }
+  .terms div { font-size: 7.6pt; padding: 1mm 0; grid-template-columns: 22mm minmax(0, 1fr); gap: 2mm; }
+  .lists { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4mm; }
+  .lists ul { font-size: 7.6pt; gap: 1mm; }
+  .scorebars { display: none; }
+  .points li { font-size: 8pt; padding: 2mm 3mm; grid-template-columns: 6mm minmax(0, 1fr); }
+  .calc { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3mm; }
+  .calc > div { padding: 3mm; }
+  .calc p, .calc table { font-size: 7.4pt; }
+  .calc h4 { font-size: 9pt; }
+  .foot { font-size: 7.4pt; }
+  .print-settings { font-size: 8pt; color: var(--ink-2); border: 1px solid var(--rule-strong); border-radius: 4px; padding: 2mm 3mm; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="wrap">
+
+  <header class="doc-head">
+    <div class="eyebrow">Bid evaluation · Yarn-dyeing project winding machinery</div>
+    <h1>Winding Machine Bid Evaluation</h1>
+    <div class="meta">
+      <span>Prepared for <b>MMS Consortium, Chattogram</b></span>
+      <span>Evaluated <b>27 October 2026</b></span>
+      <span>Price basis <b>CFR Chittagong, Incoterms 2020</b></span>
+      <span>Offers <b>7</b></span>
+      <span>Revision <b>2</b> · Gonghong quotation added</span>
+    </div>
+    <div class="scope" aria-label="Required machines">
+      <span>Soft winder <b>48</b> spindles · 160 mm, 1 kg dye package</span>
+      <span>Hard winder <b>60</b> spindles · 150/180 × 155 mm cone</span>
+      <span>Sewing-thread winder <b>48</b> spindles · auto doffing &amp; feeding</span>
+    </div>
+  </header>
+
+  <div class="verdicts">
+    <div class="verdict">
+      <span class="k">Best overall and technical</span>
+      <span class="v">Foshan Gonghong <span class="num">8.40</span></span>
+      <span class="d">Lowest compliant price: USD 139,467 CIF with auto doffing. Technical 8.90. Offer lapsed 20 Oct; ask to renew.</span>
+    </div>
+    <div class="verdict">
+      <span class="k">Runner-up</span>
+      <span class="v">Ningbo Dingming <span class="num">8.10</span></span>
+      <span class="d">USD 177,000 CFR with better terms: L/C at sight, 30-day delivery, 2-year warranty.</span>
+    </div>
+    <div class="verdict">
+      <span class="k">Best soft winder</span>
+      <span class="v">Zhejiang Taihe TH-11A-1</span>
+      <span class="d">Precision winder with programmable density. Its thread winder lacks auto doffing.</span>
+    </div>
+  </div>
+
+  <section aria-labelledby="h-rank">
+    <div class="sec-head">
+      <div class="eyebrow">Question 1 · Scores out of 10</div>
+      <h2 id="h-rank">Ranking</h2>
+      <p>Overall score is a weighted mix of the technical and commercial scores. Change the weighting or the assumptions below and the ranking updates. Select a vendor to open its profile.</p>
+    </div>
+
+    <div class="controls no-print" role="group" aria-label="Ranking settings">
+      <div class="ctl">
+        <span class="lab" id="lab-sort">Rank by</span>
+        <div class="seg" role="group" aria-labelledby="lab-sort">
+          <button type="button" id="sort-overall" data-sort="overall" aria-pressed="true">Overall</button>
+          <button type="button" id="sort-tech" data-sort="tech" aria-pressed="false">Technical</button>
+          <button type="button" id="sort-comm" data-sort="comm" aria-pressed="false">Commercial</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <label class="lab" for="w">Technical weight</label>
+        <input type="range" id="w" min="0" max="100" step="5" value="60">
+        <span class="wout" id="wout"><span class="num">60 %</span> technical · <span class="num">40 %</span> commercial</span>
+      </div>
+      <div class="ctl">
+        <span class="lab">Filter</span>
+        <label class="check" for="needauto"><input type="checkbox" id="needauto"><span>Exclude offers without automatic doffing<small>Excluded offers stay listed, greyed, without a rank.</small></span></label>
+        <button type="button" class="reset" id="reset">Reset to report settings</button>
+      </div>
+      <p class="print-hint">Prints on A4 portrait from the browser's print command. The controls are left out. The printout carries all three rankings (overall, technical and commercial) and all seven vendor profiles, whichever buttons are selected here. The weighting and filter set here are applied.</p>
+    </div>
+
+    <p class="print-only print-settings" id="print-settings"></p>
+
+    <div class="tw screen-only">
+      <table class="rank-t" id="rank-table">
+        <thead>
+          <tr><th scope="col">Rank</th><th scope="col">Vendor</th><th scope="col" id="bar-h">Overall</th><th scope="col" class="n">Overall</th><th scope="col" class="n">Tech.</th><th scope="col" class="n">Comm.</th><th scope="col">Auto doffing</th><th scope="col">Price, USD</th><th scope="col">Verdict</th></tr>
+        </thead>
+        <tbody id="rank-body"></tbody>
+      </table>
+    </div>
+    <div class="print-only print-ranks" id="print-ranks"></div>
+    <p class="note" id="rank-note"><b>Gonghong and Dingming share a commercial score of 7.65.</b> Gonghong is 21% cheaper for the full scope; Dingming has better terms. Gonghong's higher technical score keeps it first at every weighting.</p>
+  </section>
+
+  <section aria-labelledby="h-tech">
+    <div class="sec-head">
+      <div class="eyebrow">Question 5 · Technical score only</div>
+      <h2 id="h-tech">Best offer on technical grounds</h2>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th scope="col">Rank</th><th scope="col">Vendor</th><th scope="col" class="n">Technical</th><th scope="col">Why</th></tr></thead>
+        <tbody>
+          <tr><td class="num"><b>1</b></td><td><b>Foshan Gonghong</b></td><td class="n"><b>8.90</b></td><td>The most complete technical package. All three machines meet or beat the requirement, and the quotation confirms doffing and tuck-in on the GH018-A. Open points: the 1,400 rpm line, and quote vs datasheet differences on voltage, spindle power and tensioning.</td></tr>
+          <tr><td class="num">2=</td><td>Ningbo Dingming</td><td class="n">8.40</td><td>Full scope with a strong automatic winder (50 heads, 1,200 m/min). Lower practical soft-winder speed and thinner documentation.</td></tr>
+          <tr><td class="num">2=</td><td>Jiangsu Tangshi, Option B</td><td class="n">8.40</td><td>Strong automatic winder and branded components. Soft winder excludes filament polyester.</td></tr>
+          <tr><td class="num">4</td><td>Zhejiang Taihe</td><td class="n">7.80</td><td>Best soft winder (precision, programmable density). No automatic doffing on the thread winder.</td></tr>
+          <tr><td class="num">5</td><td>Jiangsu Tangshi, Option A</td><td class="n">7.15</td><td>Same winders as Option B. Its thread winder has no automatic doffing.</td></tr>
+          <tr><td class="num">6</td><td>Charming Star International</td><td class="n">5.75</td><td>Thread machine is a 150 m/min spool winder without auto doffing. Speeds quoted are no-load figures.</td></tr>
+          <tr><td class="num">7</td><td>Ningbo Credit Ocean</td><td class="n">3.60</td><td>No model numbers or technical data.</td></tr>
+          <tr><td class="num">8</td><td>Milhan Makine</td><td class="n">3.00</td><td>Hard winder only.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-mx" class="pb">
+    <div class="sec-head">
+      <div class="eyebrow">Question 1 · Score breakdown</div>
+      <h2 id="h-mx">Score matrix</h2>
+      <p>Every line is scored against the conditions in the next section. Shading shows how much of the line's maximum each offer earned. Tangshi is shown as Option B, the fully automatic offer.</p>
+    </div>
+    <div class="tw">
+      <table class="mx" id="matrix"></table>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-rub" class="pb">
+    <div class="sec-head">
+      <div class="eyebrow">Question 1 · Scoring conditions</div>
+      <h2 id="h-rub">How each line is marked</h2>
+    </div>
+    <div class="two">
+      <div class="tw">
+        <table class="rub">
+          <thead><tr><th scope="col">Code</th><th scope="col">Technical criterion</th><th scope="col" class="n">Max</th><th scope="col">Full marks</th><th scope="col">Partial marks</th><th scope="col">Zero</th></tr></thead>
+          <tbody>
+            <tr><td>S1</td><td>Soft winder: 48 spindles, individual spindle drive</td><td class="n">0.5</td><td>48 spindles, motor or inverter per spindle</td><td>Count met, model or drive not stated</td><td>Not offered</td></tr>
+            <tr><td>S2</td><td>Soft: cotton 10/1–50/1, 20/2–100/2; SSP 20/2–60/2; filament PES 50–300 D</td><td class="n">0.75</td><td>All three families confirmed with a datasheet</td><td>Claimed without data, or one family excluded</td><td>Not offered</td></tr>
+            <tr><td>S3</td><td>Soft: density 0.30–0.35 g/cm³ cotton, 0.35–0.40 g/cm³ PES</td><td class="n">0.75</td><td>Adjustable or programmable density mechanism documented</td><td>Claimed only, or "based on client request"</td><td>Not offered</td></tr>
+            <tr><td>S4</td><td>Soft: winding speed up to 1,000 m/min</td><td class="n">0.5</td><td>1,000 m/min or more as a working speed</td><td>1,000 m/min only mechanical or no-load; 600–800 m/min in practice</td><td>No data</td></tr>
+            <tr><td>S5</td><td>Soft: 160 mm / 1 kg package and features</td><td class="n">0.5</td><td>Package ≥160 mm with margin; anti-patterning, splicer, cleaner</td><td>Basic machine</td><td>Not offered</td></tr>
+            <tr><td>H1</td><td>Hard winder: 60 spindles, individual drive</td><td class="n">0.5</td><td>60 spindles, motor per spindle</td><td>Count met, model or drive not stated</td><td>Not offered</td></tr>
+            <tr><td>H2</td><td>Hard: cotton 10/1–100/2; take-up suits the 173 mm cone (5°57′ class)</td><td class="n">0.5</td><td>Count range and cone angle confirmed</td><td>Claimed without data</td><td>Not offered</td></tr>
+            <tr><td>H3</td><td>Hard: hardness 0.40–0.50 g/cm³ (pressure, tension, waxing)</td><td class="n">0.5</td><td>Mechanism documented</td><td>Partly described</td><td>No data</td></tr>
+            <tr><td>H4</td><td>Hard: 1,000 m/min and Ø180 mm package</td><td class="n">0.5</td><td>Both met</td><td>Speed below 1,000 m/min or only mechanical</td><td>No data</td></tr>
+            <tr><td>W1</td><td>Sewing-thread winder: 48 spindles</td><td class="n">0.5</td><td>48 or more spindles</td><td>48 heads from 24 spindles × 2, or count inconsistent</td><td>Not offered</td></tr>
+            <tr><td>W2</td><td>Sewing: automatic doffing and feeding</td><td class="n">1.0</td><td>Standard on the quoted machine and described</td><td>Claimed, not documented</td><td>Not available, or unpriced option</td></tr>
+            <tr><td>W3</td><td>Sewing: thread tension control</td><td class="n">0.5</td><td>Electronic or electromagnetic tension per spindle</td><td>Claimed only</td><td>None</td></tr>
+            <tr><td>W4</td><td>Sewing: speed (see the 1,400 rpm note in the open points)</td><td class="n">0.5</td><td>1,000–1,200 m/min line speed</td><td>1,000 m/min, or vendor answered NO</td><td>150 m/min or less</td></tr>
+            <tr><td>W5</td><td>Sewing: 4,000 m / 100 g package, oiling, length accuracy, take-up</td><td class="n">0.5</td><td>All documented</td><td>Partly</td><td>None</td></tr>
+            <tr><td>B</td><td>Bobbin and holder fit; traverse ≤143 mm on the soft tube</td><td class="n">0.5</td><td>Exact fit confirmed against our drawings</td><td>"Made to your sample", or 147–152 mm traverse</td><td>Incompatible</td></tr>
+            <tr><td>E</td><td>Electrical (3-ph 380–440 V or 1-ph 220–230 V, 50 Hz) and build quality</td><td class="n">0.5</td><td>Covers 380–440 V; branded drives</td><td>380 V nominal only</td><td>No data</td></tr>
+            <tr><td>D</td><td>Documentation: signed 21-line checklist, datasheets, videos, references</td><td class="n">1.0</td><td>All present and consistent</td><td>Gaps or contradictions</td><td>Nothing usable</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tw">
+        <table class="rub">
+          <thead><tr><th scope="col">Code</th><th scope="col">Commercial criterion</th><th scope="col" class="n">Max</th><th scope="col">Full marks</th><th scope="col">Partial marks</th><th scope="col">Zero</th></tr></thead>
+          <tbody>
+            <tr><td>P</td><td>Price for the full required scope, like for like</td><td class="n">4.0</td><td>Lowest compliant full-scope price</td><td>Scaled by price; reduced if scope is incomplete or a machine is non-compliant</td><td>No price</td></tr>
+            <tr><td>I</td><td>Price basis CFR Chittagong including freight</td><td class="n">1.0</td><td>CFR or CNF Chattogram</td><td>FOB with freight estimate, or EXW</td><td>Not stated</td></tr>
+            <tr><td>Pay</td><td>Payment terms</td><td class="n">1.0</td><td>L/C at sight</td><td>TT advance</td><td>Cash in advance, or not stated</td></tr>
+            <tr><td>L</td><td>Lead time and offer validity</td><td class="n">1.0</td><td>30 days or less, validity 30 days or more</td><td>45–75 days, or validity expired</td><td>Not stated</td></tr>
+            <tr><td>W</td><td>Warranty, installation and after-sales</td><td class="n">2.0</td><td>2 years or more with defined commissioning</td><td>1 year, engineer at buyer's cost</td><td>Not stated</td></tr>
+            <tr><td>Sp</td><td>Priced spare-parts list; packing weights and volume</td><td class="n">1.0</td><td>Both supplied</td><td>One, or partial</td><td>Neither</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-price">
+    <div class="sec-head">
+      <div class="eyebrow">Commercial · USD</div>
+      <h2 id="h-price">Price comparison</h2>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th scope="col">Vendor</th><th scope="col" class="n">Soft, 48 sp</th><th scope="col" class="n">Hard, 60 sp</th><th scope="col" class="n">Sewing thread, 48 sp</th><th scope="col" class="n">Extras</th><th scope="col" class="n">Freight</th><th scope="col" class="n">Total</th><th scope="col">Basis</th></tr></thead>
+        <tbody>
+          <tr><td><b>Ningbo Dingming</b></td><td class="n">12,000</td><td class="n">15,000</td><td class="n">150,000<br><span class="muted small">auto, 50 heads</span></td><td class="n">free spares</td><td class="n">incl.</td><td class="n"><b>177,000</b></td><td>CFR Chittagong</td></tr>
+          <tr><td>Jiangsu Tangshi, B</td><td class="n">14,880</td><td class="n">18,000</td><td class="n">144,000<br><span class="muted small">auto, 2 × 24</span></td><td class="n">6,200</td><td class="n">8,100</td><td class="n"><b>191,180</b></td><td>CFR Chittagong</td></tr>
+          <tr><td>Jiangsu Tangshi, A</td><td class="n">14,880</td><td class="n">18,000</td><td class="n">81,600<br><span class="muted small">no auto doffing</span></td><td class="n">6,200</td><td class="n">8,100</td><td class="n"><b>128,780</b></td><td>CFR Chittagong</td></tr>
+          <tr><td>Zhejiang Taihe</td><td class="n">44,500<br><span class="muted small">precision</span></td><td class="n">18,800</td><td class="n">79,200<br><span class="muted small">no auto doffing</span></td><td class="n">3,200</td><td class="n">incl.</td><td class="n"><b>145,700</b></td><td>CNF Chattogram</td></tr>
+          <tr><td><b>Foshan Gonghong</b></td><td class="n">12,332<br><span class="muted small">8 × 6 sp</span></td><td class="n">15,415<br><span class="muted small">10 × 6 sp</span></td><td class="n">111,720<br><span class="muted small">GH018-A auto, 12 × 4</span></td><td class="n">spares 3,695 opt.</td><td class="n">incl. 7,347</td><td class="n"><b>139,467</b></td><td>CIF Chattogram</td></tr>
+          <tr><td>Foshan Gonghong, alt.</td><td class="n">12,332</td><td class="n">15,415</td><td class="n">72,680<br><span class="muted small">GH019-SA, no auto doffing stated</span></td><td class="n">–</td><td class="n">incl.</td><td class="n"><b>100,427</b></td><td>CIF Chattogram</td></tr>
+          <tr><td>Charming Star</td><td class="n">16,950</td><td class="n">18,860</td><td class="n">11,120<br><span class="muted small">manual spool winder</span></td><td class="n">splicers incl.</td><td class="n">≈6,800 est.</td><td class="n"><b>46,930</b></td><td>FOB Shanghai</td></tr>
+          <tr><td>Credit Ocean, opt. 1</td><td class="n">10,560</td><td class="n">11,600</td><td class="n">99,600<br><span class="muted small">auto, 12 × 4</span></td><td class="n">–</td><td class="n">not quoted</td><td class="n"><b>121,760</b></td><td>FOB Ningbo</td></tr>
+          <tr><td>Credit Ocean, opt. 2</td><td class="n">6,600</td><td class="n">8,000</td><td class="n">99,600</td><td class="n">–</td><td class="n">not quoted</td><td class="n"><b>114,200</b></td><td>FOB Ningbo</td></tr>
+          <tr><td>Milhan Makine</td><td class="n">–</td><td class="n">55,000</td><td class="n">–</td><td class="n">cleaner incl.</td><td class="n">buyer</td><td class="n"><b>55,000</b></td><td>EXW Istanbul</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><b>Gonghong's USD 139,467 CIF is the lowest compliant full-scope price:</b> Dingming is 27% higher and Tangshi B 37% higher. Gonghong's prices hold only for the quoted quantities. Tangshi's totals include USD 6,200 of optional splicers and blowers. Per spindle, automatic thread winders cost about USD 2,075 FOB (Credit Ocean, unverified), 2,328 CIF (Gonghong), 3,000 CFR (Dingming) and 3,000 ex-works (Tangshi). For the soft and hard winders alone, Dingming (27,000 CFR) and Gonghong (27,747 CIF) are level.</p>
+  </section>
+
+  <section aria-labelledby="h-prof" id="profiles">
+    <div class="sec-head">
+      <div class="eyebrow">Questions 2, 3 and 4 · Per vendor</div>
+      <h2 id="h-prof">Vendor profiles</h2>
+      <p>What each offer exceeds, where it falls short, and what to ask before the next round. Select a vendor to go to its profile, or switch to one at a time. On screen, each profile also charts its score breakdown.</p>
+    </div>
+
+    <div class="vp-bar no-print">
+      <div class="tabs" role="group" aria-label="Go to a vendor" id="tabs"></div>
+      <div class="seg" role="group" aria-label="Profiles shown">
+        <button type="button" id="view-all" data-view="all" aria-pressed="true">All vendors</button>
+        <button type="button" id="view-one" data-view="one" aria-pressed="false">One at a time</button>
+      </div>
+    </div>
+
+    <article class="vp" id="vp-GH" data-v="GH">
+      <div class="vp-head"><span class="vcode">GH</span><div><h3>Foshan Gonghong Textile Machinery</h3><span class="vsub">China · manufacturer · quotation GH-XP26-14840 of 10 Oct 2026, signed and stamped</span></div><div class="pills" data-pills="GH"></div></div>
+      <dl class="terms">
+        <div class="wide"><dt>Models</dt><dd>GH018-S soft, 8 single-sided sets × 6 spindles · GH018-M hard, 10 sets × 6 spindles · GH018-A fully automatic tuck-in thread winder, 12 sets × 4 spindles. Alternative: GH019-SA automatic A-cone winder, 12 sets × 4 spindles / 8 cones.</dd></div>
+        <div><dt>Price</dt><dd>USD 139,467 CIF Chattogram (FOB Guangzhou 132,120)</dd></div>
+        <div><dt>Payment</dt><dd>30% TT deposit, 70% before shipment</dd></div>
+        <div><dt>Delivery</dt><dd>60 days</dd></div>
+        <div><dt>Warranty</dt><dd>1 year</dd></div>
+        <div><dt>Validity</dt><dd>10 days; lapsed 20 Oct 2026</dd></div>
+        <div><dt>Installation</dt><dd>Remote and video support, reply in 12–24 h; no on-site technician</dd></div>
+        <div class="wide"><dt>Spares, packing</dt><dd>Priced spares: USD 417 for soft and hard, USD 3,278 for 12 × GH018-A. Packing: 21 packages, two 40HQ, 9,900 kg net, 10,950 kg gross, 69.5 m³.</dd></div>
+      </dl>
+      <div class="lists">
+        <div class="ex"><h4>Exceeds our requirement</h4><ul>
+          <li>Lowest compliant full-scope price, and CIF: insurance included</li>
+          <li>Soft and hard winders at 300–1,100 m/min</li>
+          <li>Packages up to 250 mm; hard cones 3°30′ to 9°15′</li>
+          <li>GH018-A with doffing, automatic tuck-in and heated silicone oiling; up to 1,200 m/min, ±0.5% length accuracy</li>
+          <li>Low spindle power, 60 W in the quote</li>
+          <li>Only vendor with priced spares and a full packing list</li>
+        </ul></div>
+        <div class="sh"><h4>Falls short</h4><ul>
+          <li>Offer validity 10 days, lapsed 20 Oct 2026</li>
+          <li>30% / 70% TT payment, no L/C; 60-day delivery</li>
+          <li>Quote and datasheet differ: 220/380 V vs 400 V ±10%, 60 W vs 100 W, disc tensioner vs spring balance and waxing</li>
+          <li>No blower-cleaner or splicer in the price</li>
+          <li>18 separate 6-spindle sets for soft and hard</li>
+          <li>Answered NO to 1,400 rpm without a remark; traverse 147 mm</li>
+          <li>No on-site commissioning</li>
+        </ul></div>
+        <div class="ask"><h4>Ask before the next round</h4><ul>
+          <li>Renew the offer and confirm prices still stand</li>
+          <li>L/C at sight instead of TT</li>
+          <li>Supply voltage and 415 V operation; installed power per spindle</li>
+          <li>Whether spring balance, waxing and blower-cleaner are included; prices for splicers and yarn clearers</li>
+          <li>12-spindle double-sided sets instead of 6-spindle sets</li>
+          <li>Whether GH019-SA has automatic doffing</li>
+          <li>On-site commissioning cost; South Asia references; traverse of 140 mm or less</li>
+        </ul></div>
+      </div>
+      <div class="scorebars" data-bars="GH"></div>
+    </article>
+
+    <article class="vp" id="vp-DM" data-v="DM">
+      <div class="vp-head"><span class="vcode">DM</span><div><h3>Ningbo Dingming Machinery</h3><span class="vsub">China · manufacturer with an import-export arm · quotes of 9 Oct 2026</span></div><div class="pills" data-pills="DM"></div></div>
+      <dl class="terms">
+        <div class="wide"><dt>Models</dt><dd>DM0702-SF soft (48 sp) · DM0702-TH hard (60 sp) · DM0605 fully automatic thread winder, 2 sets of 25 heads</dd></div>
+        <div><dt>Price</dt><dd>USD 177,000 CFR Chittagong</dd></div>
+        <div><dt>Payment</dt><dd>L/C at sight</dd></div>
+        <div><dt>Delivery</dt><dd>30 days after L/C</dd></div>
+        <div><dt>Warranty</dt><dd>2 years</dd></div>
+        <div><dt>Validity</dt><dd>30 days, to 8 Nov 2026</dd></div>
+        <div><dt>Installation</dt><dd>Not stated</dd></div>
+        <div class="wide"><dt>Spares, packing</dt><dd>Free spares kit with each machine. No packing weights or volume.</dd></div>
+      </dl>
+      <div class="lists">
+        <div class="ex"><h4>Exceeds our requirement</h4><ul>
+          <li>50 heads on the automatic winder; 48 required</li>
+          <li>2-year warranty; others give 1 year</li>
+          <li>30-day delivery</li>
+          <li>Auto winder up to 1,200 m/min, 63–152 mm traverse, up to 3,300 D</li>
+          <li>Soft density adjustable 0.2–0.4 g/cm³</li>
+          <li>Says it installed 360 soft and 10 auto spindles in Dhaka in Sept 2026; offers a visit</li>
+        </ul></div>
+        <div class="sh"><h4>Falls short</h4><ul>
+          <li>Catalogue speed 800 m/min cotton, 600 m/min polyester</li>
+          <li>Soft traverse 152 mm, longer than the 143 mm tube body</li>
+          <li>Holders based on a 6″ (170 mm) bobbin</li>
+          <li>Old-format checklist, density figures blank</li>
+          <li>No videos, installation terms, packing data or priced spares</li>
+        </ul></div>
+        <div class="ask"><h4>Ask before the next round</h4><ul>
+          <li>Videos of all three machines running</li>
+          <li>Name and contact of the Dhaka installation, and a visit</li>
+          <li>Signed 21-line checklist with density figures</li>
+          <li>Working speed on 50–300 D filament polyester</li>
+          <li>Soft traverse of 140 mm or less</li>
+          <li>Doffing cycle time and magazine capacity</li>
+          <li>Installation cost, packing list, priced 2-year spares</li>
+        </ul></div>
+      </div>
+      <div class="scorebars" data-bars="DM"></div>
+    </article>
+
+    <article class="vp" id="vp-TS" data-v="TS">
+      <div class="vp-head"><span class="vcode">TS</span><div><h3>Jiangsu Tangshi Textile Machinery Group</h3><span class="vsub">China · manufacturer · quotation 26INV1004 · scored as Option B</span></div><div class="pills" data-pills="TS"></div></div>
+      <dl class="terms">
+        <div class="wide"><dt>Models</dt><dd>TS008S soft (48 sp) · TS008M hard (60 sp) · TS008O fully automatic, 2 × 24 spindles (Option B). Option A: TS008O standard, 12 × 4 spindles, no auto doffing.</dd></div>
+        <div><dt>Price</dt><dd>B: USD 191,180 CFR · A: USD 128,780 CFR</dd></div>
+        <div><dt>Payment</dt><dd>L/C at sight</dd></div>
+        <div><dt>Delivery</dt><dd>60 days production, from Shanghai</dd></div>
+        <div><dt>Warranty</dt><dd>12 months from delivery, single shift</dd></div>
+        <div><dt>Validity</dt><dd>30 days; price may change if costs move</dd></div>
+        <div><dt>Installation</dt><dd>Engineer at USD 150/day plus travel, visa and lodging, about 9 days; or remote</dd></div>
+        <div class="wide"><dt>Spares, packing</dt><dd>No spares list. Export wooden cases, two 40′ containers; soft 2,000 kg, hard 2,500 kg.</dd></div>
+      </dl>
+      <div class="lists">
+        <div class="ex"><h4>Exceeds our requirement</h4><ul>
+          <li>Mitsubishi inverters, NSK bearings, LCD touch screens</li>
+          <li>Packages up to 250 mm</li>
+          <li>Auto winder up to 1,200 m/min with electronic tension per spindle</li>
+          <li>Only signed and sealed checklist</li>
+          <li>Quoted without commission or negotiation margin</li>
+        </ul></div>
+        <div class="sh"><h4>Falls short</h4><ul>
+          <li>Soft winder not suitable for filament polyester (declared)</li>
+          <li>About 800 m/min cotton, 600 m/min fibre</li>
+          <li>Datasheets list a 6″ (170 mm) bobbin; our tube is 160.4 mm</li>
+          <li>Traverse 147 / 152 mm</li>
+          <li>Auto winder take-up Ø100 mm maximum</li>
+          <li>No spares list, videos, gross weight or CBM</li>
+          <li>Single-shift warranty; price-variation clause</li>
+        </ul></div>
+        <div class="ask"><h4>Ask before the next round</h4><ul>
+          <li>Confirm Option B as the base offer; list what Option A includes</li>
+          <li>How the 160.4 mm tube fits a 170 mm holder</li>
+          <li>Soft traverse of 140 mm or less</li>
+          <li>A filament-capable soft winder</li>
+          <li>Multi-shift warranty; remove the price-variation clause</li>
+          <li>Priced spares, gross weight, CBM, videos</li>
+        </ul></div>
+      </div>
+      <div class="scorebars" data-bars="TS"></div>
+    </article>
+
+    <article class="vp" id="vp-TH" data-v="TH">
+      <div class="vp-head"><span class="vcode">TH</span><div><h3>Zhejiang Taihe Spinning Machine</h3><span class="vsub">China · manufacturer · quotations of 10 Oct 2026</span></div><div class="pills" data-pills="TH"></div></div>
+      <dl class="terms">
+        <div class="wide"><dt>Models</dt><dd>TH-11A-1 precision soft winder (48 sp) · TH-8H hard (60 sp) · TH-15A thread winder, 12 × 4 spindles</dd></div>
+        <div><dt>Price</dt><dd>USD 145,700 CNF Chattogram</dd></div>
+        <div><dt>Payment</dt><dd>100% irrevocable L/C at sight</dd></div>
+        <div><dt>Delivery</dt><dd>45 working days after L/C</dd></div>
+        <div><dt>Warranty</dt><dd>1 year</dd></div>
+        <div><dt>Validity</dt><dd>Not stated</dd></div>
+        <div><dt>Installation</dt><dd>Technician USD 80/day plus air tickets, lodging and food</dd></div>
+        <div class="wide"><dt>Spares, packing</dt><dd>"Standard spare parts" per machine, not itemised. Export packing, no weights.</dd></div>
+      </dl>
+      <div class="lists">
+        <div class="ex"><h4>Exceeds our requirement</h4><ul>
+          <li>Precision soft winder with programmable density and package build</li>
+          <li>Traverse 147–250 mm, infinitely variable</li>
+          <li>Packages up to 250 mm and 2 kg</li>
+          <li>Handles filament, spun and cotton yarn</li>
+          <li>Air splicer and blower included on the hard winder</li>
+        </ul></div>
+        <div class="sh"><h4>Falls short</h4><ul>
+          <li>TH-15A has no automatic doffing or feeding</li>
+          <li>TH-15A quoted at 400–1,000 m/min</li>
+          <li>No checklist or point-by-point compliance</li>
+          <li>Validity, packing and spares not given</li>
+          <li>Soft winder minimum traverse 147 mm</li>
+          <li>Soft winder is 18.1 m long, single-sided</li>
+        </ul></div>
+        <div class="ask"><h4>Ask before the next round</h4><ul>
+          <li>Price for an automatic doffing and feeding thread winder</li>
+          <li>Signed 21-line checklist</li>
+          <li>Offer validity, packing list, itemised spares</li>
+          <li>Can the TH-11A-1 traverse go below 147 mm</li>
+          <li>A double-sided or shorter soft winder layout</li>
+        </ul></div>
+      </div>
+      <div class="scorebars" data-bars="TH"></div>
+    </article>
+
+
+    <article class="vp" id="vp-CS" data-v="CS">
+      <div class="vp-head"><span class="vcode">CS</span><div><h3>Charming Star International</h3><span class="vsub">Taiwan · ships FOB Shanghai · quotation BD261008SA of 8 Oct 2026</span></div><div class="pills" data-pills="CS"></div></div>
+      <dl class="terms">
+        <div class="wide"><dt>Models</dt><dd>CMcw-600C soft (4 × 12) · CMcw-600CH hard (5 × 12) · CMsp-2A spool winder, 4 sets × 6 spindles × 2 bobbins</dd></div>
+        <div><dt>Price</dt><dd>USD 46,930 FOB Shanghai; freight about 6,800</dd></div>
+        <div><dt>Payment</dt><dd>50% TT advance, 50% before shipment</dd></div>
+        <div><dt>Delivery</dt><dd>60–75 working days after down payment</dd></div>
+        <div><dt>Warranty</dt><dd>Not stated</dd></div>
+        <div><dt>Validity</dt><dd>30 days, to 7 Nov 2026</dd></div>
+        <div><dt>Installation</dt><dd>Not stated</dd></div>
+        <div class="wide"><dt>Spares, packing</dt><dd>No spares list. Four splicers per winder included. Spool winder 217 × 70 × 115 cm, 300 / 400 kg.</dd></div>
+      </dl>
+      <div class="lists">
+        <div class="ex"><h4>Exceeds our requirement</h4><ul>
+          <li>Packages up to Ø250 mm</li>
+          <li>Four splicers per winder and blower-suction on the soft winder included</li>
+          <li>Five machine videos supplied</li>
+        </ul></div>
+        <div class="sh"><h4>Falls short</h4><ul>
+          <li>Thread machine has no auto doffing (unpriced option) and runs at 150 m/min or less</li>
+          <li>1,000 m/min only "without loading"; 600–800 m/min in practice</li>
+          <li>Density "based on client request"</li>
+          <li>Take-up range 170–175 mm does not fit the 160.4 mm tube; traverse 152 mm</li>
+          <li>FOB price; no warranty, spares or packing</li>
+          <li>Declined to list deviations</li>
+        </ul></div>
+        <div class="ask"><h4>Ask before the next round</h4><ul>
+          <li>CFR Chittagong price</li>
+          <li>A priced automatic-doffing thread winder</li>
+          <li>Guaranteed speeds under load</li>
+          <li>Holder for 160.4 mm tubes</li>
+          <li>Warranty, spares, packing</li>
+          <li>Written list of deviations</li>
+        </ul></div>
+      </div>
+      <div class="scorebars" data-bars="CS"></div>
+    </article>
+
+    <article class="vp" id="vp-CO" data-v="CO">
+      <div class="vp-head"><span class="vcode">CO</span><div><h3>Ningbo Credit Ocean Machinery</h3><span class="vsub">China · may be a trading company · prices of 16 Oct 2026</span></div><div class="pills" data-pills="CO"></div></div>
+      <dl class="terms">
+        <div class="wide"><dt>Models</dt><dd>None given. Two winder options in 12-spindle sets; automatic thread winder in 4-spindle units, "4-inch bobbin type".</dd></div>
+        <div><dt>Price</dt><dd>USD 121,760 (opt. 1) or 114,200 (opt. 2) FOB Ningbo</dd></div>
+        <div><dt>Payment</dt><dd>Not stated</dd></div>
+        <div><dt>Delivery</dt><dd>Not stated</dd></div>
+        <div><dt>Warranty</dt><dd>Not stated</dd></div>
+        <div><dt>Validity</dt><dd>Not stated</dd></div>
+        <div><dt>Installation</dt><dd>Not stated</dd></div>
+        <div class="wide"><dt>Spares, packing</dt><dd>Not given</dd></div>
+      </dl>
+      <div class="lists">
+        <div class="ex"><h4>Exceeds our requirement</h4><ul>
+          <li>Nothing that can be verified</li>
+        </ul></div>
+        <div class="sh"><h4>Falls short</h4><ul>
+          <li>No models, datasheets or compliance remarks</li>
+          <li>Unsigned checklist without a company name</li>
+          <li>6 spindles per unit on 13 Oct, 4 on 16 Oct</li>
+          <li>"4-inch bobbin" against our 114 mm bobbin</li>
+          <li>One photo shows a line-shaft winder</li>
+          <li>Video link could not be downloaded</li>
+        </ul></div>
+        <div class="ask"><h4>Ask before the next round</h4><ul>
+          <li>A complete offer: models, datasheets, CFR prices, terms</li>
+          <li>Manufacturer or trader, and which factory</li>
+          <li>Which photo is which option</li>
+          <li>4 or 6 spindles per thread unit</li>
+          <li>Re-send the videos</li>
+        </ul></div>
+      </div>
+      <div class="scorebars" data-bars="CO"></div>
+    </article>
+
+    <article class="vp" id="vp-MH" data-v="MH">
+      <div class="vp-head"><span class="vcode">MH</span><div><h3>Milhan Makine</h3><span class="vsub">Turkey · manufacturer · offer of 9 Oct 2026</span></div><div class="pills" data-pills="MH"></div></div>
+      <dl class="terms">
+        <div class="wide"><dt>Models</dt><dd>FSM-01 hard winder, 60 spindles (5 × 12), double-sided. Soft and sewing-thread machines declined.</dd></div>
+        <div><dt>Price</dt><dd>USD 55,000 EXW Istanbul (50,000 net to MMS)</dd></div>
+        <div><dt>Payment</dt><dd>Cash</dd></div>
+        <div><dt>Delivery</dt><dd>6–7 weeks after order</dd></div>
+        <div><dt>Warranty</dt><dd>Mechanical 1 year, electronics 6 months</dd></div>
+        <div><dt>Validity</dt><dd>1 week; expired 16 Oct 2026</dd></div>
+        <div><dt>Installation</dt><dd>Engineers at buyer's travel cost; buyer must allow demos to Milhan's prospects</dd></div>
+        <div class="wide"><dt>Spares, packing</dt><dd>Not given. Travelling cleaner included.</dd></div>
+      </dl>
+      <div class="lists">
+        <div class="ex"><h4>Exceeds our requirement</h4><ul>
+          <li>CE marked</li>
+          <li>Maximum cone Ø320 mm</li>
+          <li>Travelling cleaner included; 12 V control circuits</li>
+          <li>4,743 export heads, including 228 at GMS Composite, Bangladesh</li>
+        </ul></div>
+        <div class="sh"><h4>Falls short</h4><ul>
+          <li>No soft or sewing-thread machine</li>
+          <li>200–900 m/min</li>
+          <li>About three times the market price; EXW; cash</li>
+          <li>Electronics warranty 6 months; validity expired</li>
+          <li>Unsigned checklist contradicts the quote</li>
+        </ul></div>
+        <div class="ask"><h4>Ask before the next round</h4><ul>
+          <li>Only if a European-built hard winder is wanted: renewed CFR price, L/C payment, a 1,000 m/min version, no demo clause</li>
+        </ul></div>
+      </div>
+      <div class="scorebars" data-bars="MH"></div>
+    </article>
+  </section>
+
+  <section aria-labelledby="h-open" class="pb">
+    <div class="sec-head">
+      <div class="eyebrow">Question 4 · For every shortlisted vendor</div>
+      <h2 id="h-open">Points to settle before the next round</h2>
+      <p>Send these to Gonghong, Dingming, Tangshi and Taihe with a request for a best-and-final CFR offer within 7 days.</p>
+    </div>
+    <ol class="points">
+      <li><span><b>Soft package figures do not reconcile.</b> 160 mm × 1 kg on the 143 mm body is about 0.39 g/cm³, above the cotton band of 0.30–0.35. Decide whether diameter, weight or density governs, and make it the acceptance test.</span></li>
+      <li><span><b>Hard package figures do not reconcile.</b> 150/180 × 155 mm at 1 kg is about 0.34 g/cm³. At 0.40–0.50 g/cm³ the same cone weighs 1.18–1.48 kg. The sheet already marks this "confirm".</span></li>
+      <li><span><b>Traverse.</b> Every offer uses 147–152 mm against a 143.00 mm tube body. Ask for a 140 mm drum or setting so yarn stays off the 10.40 and 7.00 mm stepped ends.</span></li>
+      <li><span><b>Thread winder speed.</b> 1,400 rpm on this bobbin is only 120–350 m/min. Restate the requirement in m/min, for example at least 1,000 m/min.</span></li>
+      <li><span><b>Voltage.</b> Site supply is 415 V and the RFQ allows 440 V. A 380 V ±10% machine tops out at 418 V. Ask for confirmation at 415 V, or a transformer in the offer.</span></li>
+      <li><span><b>Corrected soft bobbin drawing.</b> Steps 54.70 / 49.60 / 43.15 at the bottom and 43.15 / 48.80 / 52.90 at the top. Only Charming Star has the corrected version.</span></li>
+      <li><span><b>Sample tubes and a recorded trial.</b> Ship soft, hard and sewing tubes plus yarn. Require a video before shipment with measured density, weight, dimensions and a full doffing cycle.</span></li>
+      <li><span><b>Common terms.</b> Signed 21-line checklist, CFR Chittagong price, L/C at sight with about 10% held until commissioning, lead time, warranty from commissioning, installation cost, HS codes.</span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="h-calc">
+    <div class="sec-head">
+      <div class="eyebrow">Appendix · Our own specification</div>
+      <h2 id="h-calc">Package and speed checks</h2>
+    </div>
+    <div class="calc">
+      <div>
+        <h4>Soft package, Ø160 mm, 1 kg</h4>
+        <p>Core Ø54.7 mm. Density at 1 kg by traverse:</p>
+        <table>
+          <thead><tr><th scope="col">Traverse</th><th scope="col" class="n">Yarn vol.</th><th scope="col" class="n">g/cm³</th></tr></thead>
+          <tbody>
+            <tr><td>140 mm</td><td class="n">2,486 cm³</td><td class="n">0.402</td></tr>
+            <tr><td>143 mm</td><td class="n">2,539 cm³</td><td class="n">0.394</td></tr>
+            <tr><td>147 mm</td><td class="n">2,610 cm³</td><td class="n">0.383</td></tr>
+            <tr><td>152 mm</td><td class="n">2,699 cm³</td><td class="n">0.371</td></tr>
+          </tbody>
+        </table>
+        <p>On 143 mm, 1 kg needs Ø181 mm at 0.30 and Ø169 mm at 0.35 g/cm³.</p>
+      </div>
+      <div>
+        <h4>Hard cone, 150/180 × 155 mm</h4>
+        <p>Envelope 3,323 cm³ less bobbin 364 cm³ leaves 2,959 cm³ of yarn: 0.338 g/cm³ at 1 kg.</p>
+        <table>
+          <thead><tr><th scope="col">Density</th><th scope="col" class="n">Cone weight</th></tr></thead>
+          <tbody>
+            <tr><td>0.40 g/cm³</td><td class="n">1,184 g</td></tr>
+            <tr><td>0.45 g/cm³</td><td class="n">1,332 g</td></tr>
+            <tr><td>0.50 g/cm³</td><td class="n">1,480 g</td></tr>
+          </tbody>
+        </table>
+        <p>Bobbin half-angle 5.6°, so it needs a 5°57′-class holder.</p>
+      </div>
+      <div>
+        <h4>Sewing thread, 50/2 spun</h4>
+        <p>Resultant Ne 25 is 42.3 m/g: 100 g holds about 4,233 m, so 4,000 m weighs 94.5 g. The package standard holds.</p>
+        <table>
+          <thead><tr><th scope="col">Spindle</th><th scope="col">Diameter</th><th scope="col" class="n">Line speed</th></tr></thead>
+          <tbody>
+            <tr><td>1,400 rpm</td><td>28 mm</td><td class="n">123 m/min</td></tr>
+            <tr><td>1,400 rpm</td><td>38 mm</td><td class="n">167 m/min</td></tr>
+            <tr><td>1,400 rpm</td><td>80 mm</td><td class="n">352 m/min</td></tr>
+            <tr><td>≈11,600 rpm</td><td>33 mm</td><td class="n">1,200 m/min</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>Sources: every file in the seven vendor zip files (quotations, datasheets, catalogue pages, checklists, packing and spares lists, emails, photos). Videos were noted as supplied but not scored frame by frame.</p>
+    <p>Revision 2: Gonghong's quotation GH-XP26-14840 was not in its zip file and was supplied separately; Gonghong is re-scored with it. No other vendor's scores changed.</p>
+    <p>Winding_Machines_Combined_Specification.pdf was not in the repository. Requirements were taken from the RFQ text, the 21-line Technical Compliance Checklist and the corrected soft bobbin drawing.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var TECH = [
+    { g: "Soft winder", max: 3, rows: [["S1", "48 spindles, individual drive", 0.5], ["S2", "Yarn range incl. filament PES", 0.75], ["S3", "Density control", 0.75], ["S4", "Speed 1,000 m/min", 0.5], ["S5", "Package and features", 0.5]] },
+    { g: "Hard winder", max: 2, rows: [["H1", "60 spindles, individual drive", 0.5], ["H2", "Cotton range, 5°57′ cone", 0.5], ["H3", "Hardness control", 0.5], ["H4", "Speed and Ø180 mm package", 0.5]] },
+    { g: "Sewing-thread winder", max: 3, rows: [["W1", "48 spindles", 0.5], ["W2", "Automatic doffing and feeding", 1], ["W3", "Tension control", 0.5], ["W4", "Speed", 0.5], ["W5", "Package, oiling, accuracy", 0.5]] },
+    { g: "Common", max: 0, rows: [["B", "Bobbin fit, traverse", 0.5], ["E", "Electrical and build", 0.5], ["D", "Documentation", 1]] }
+  ];
+  var COMM = [["P", "Price for full scope", 4], ["I", "CFR price basis", 1], ["Pay", "Payment terms", 1], ["L", "Lead time, validity", 1], ["W", "Warranty, after-sales", 2], ["Sp", "Spares, packing data", 1]];
+
+  var V = {
+    DM: { short: "Dingming", name: "Ningbo Dingming", sub: "DM0702-SF · DM0702-TH · DM0605 auto", auto: "y", price: "177,000", basis: "CFR Chittagong", verdict: "Strong alternative · shortlist", tone: "good",
+      s: { S1: .5, S2: .6, S3: .6, S4: .35, S5: .4, H1: .5, H2: .5, H3: .4, H4: .4, W1: .5, W2: 1, W3: .45, W4: .5, W5: .45, B: .3, E: .4, D: .55 },
+      c: { P: 2.75, I: 1, Pay: .9, L: 1, W: 1.5, Sp: .5 } },
+    TS: { short: "Tangshi B", name: "Jiangsu Tangshi", sub: "Option B · TS008S · TS008M · TS008O auto", auto: "y", price: "191,180", basis: "CFR Chittagong", verdict: "Shortlist", tone: "good",
+      s: { S1: .5, S2: .4, S3: .5, S4: .35, S5: .4, H1: .5, H2: .5, H3: .4, H4: .45, W1: .5, W2: 1, W3: .5, W4: .5, W5: .4, B: .3, E: .45, D: .75 },
+      c: { P: 2.5, I: .9, Pay: .9, L: .6, W: 1.2, Sp: .4 } },
+    TH: { short: "Taihe", name: "Zhejiang Taihe", sub: "TH-11A-1 · TH-8H · TH-15A", auto: "n", price: "145,700", basis: "CNF Chattogram, no auto doffing", verdict: "Shortlist if auto doffing added", tone: "warn",
+      s: { S1: .5, S2: .75, S3: .75, S4: .4, S5: .5, H1: .5, H2: .5, H3: .4, H4: .5, W1: .5, W2: 0, W3: .5, W4: .45, W5: .4, B: .25, E: .45, D: .45 },
+      c: { P: 2, I: 1, Pay: .9, L: .7, W: 1.3, Sp: .2 } },
+    GH: { short: "Gonghong", name: "Foshan Gonghong", sub: "GH018-S · GH018-M · GH018-A auto", auto: "y", price: "139,467", basis: "CIF Chattogram, offer lapsed 20 Oct", verdict: "Best overall · shortlist", tone: "good",
+      s: { S1: .5, S2: .6, S3: .65, S4: .5, S5: .4, H1: .5, H2: .5, H3: .4, H4: .5, W1: .5, W2: 1, W3: .45, W4: .4, W5: .5, B: .3, E: .45, D: .75 },
+      c: { P: 3.75, I: 1, Pay: .4, L: .4, W: 1.1, Sp: 1 } },
+    CS: { short: "Charming Star", name: "Charming Star International", sub: "CMcw-600C · CMcw-600CH · CMsp-2A", auto: "n", price: "46,930", basis: "FOB Shanghai, thread winder non-compliant", verdict: "Not recommended as offered", tone: "bad",
+      s: { S1: .5, S2: .4, S3: .35, S4: .25, S5: .45, H1: .5, H2: .45, H3: .3, H4: .3, W1: .4, W2: 0, W3: .35, W4: .15, W5: .3, B: .15, E: .35, D: .55 },
+      c: { P: 2, I: .4, Pay: .4, L: .4, W: .2, Sp: .25 } },
+    CO: { short: "Credit Ocean", name: "Ningbo Credit Ocean", sub: "No model numbers given", auto: "q", price: "114,200–121,760", basis: "FOB Ningbo", verdict: "Needs a full offer", tone: "bad",
+      s: { S1: .3, S2: .2, S3: .15, S4: .1, S5: .1, H1: .3, H2: .2, H3: .1, H4: .1, W1: .35, W2: .7, W3: .25, W4: .15, W5: .15, B: .15, E: .15, D: .15 },
+      c: { P: 3.5, I: .3, Pay: 0, L: 0, W: 0, Sp: 0 } },
+    MH: { short: "Milhan", name: "Milhan Makine", sub: "FSM-01 hard winder only", auto: "x", price: "55,000", basis: "EXW Istanbul, hard winder only", verdict: "Not recommended", tone: "bad",
+      s: { S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, H1: .5, H2: .5, H3: .5, H4: .35, W1: 0, W2: 0, W3: 0, W4: 0, W5: 0, B: .2, E: .45, D: .5 },
+      c: { P: .5, I: .1, Pay: .2, L: .3, W: .8, Sp: .1 } }
+  };
+  var ORDER = ["GH", "DM", "TS", "TH", "CS", "CO", "MH"];
+  var AUTO_TEXT = { y: ["Yes", "y"], n: ["No", "n"], q: ["Claimed", "q"], x: ["Not offered", "n"] };
+  var DEFAULTS = { w: 60, sort: "overall", needAuto: false, sel: "GH", view: "all" };
+  var KEY = "wm-bid-eval-v3";
+
+  function sum(obj) { var t = 0; for (var k in obj) t += obj[k]; return Math.round(t * 100) / 100; }
+  ORDER.forEach(function (id) { V[id].T = sum(V[id].s); V[id].C = sum(V[id].c); });
+
+  var state = Object.assign({}, DEFAULTS);
+  try {
+    var saved = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (saved && typeof saved === "object") {
+      if (typeof saved.w === "number" && saved.w >= 0 && saved.w <= 100) state.w = saved.w;
+      if (["overall", "tech", "comm"].indexOf(saved.sort) > -1) state.sort = saved.sort;
+      state.needAuto = !!saved.needAuto;
+      if (V[saved.sel]) state.sel = saved.sel;
+      if (saved.view === "one") state.view = "one";
+    }
+  } catch (e) { /* storage unavailable: use defaults */ }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignore */ } }
+
+  function comm(id) { return V[id].C; }
+  function overall(id) { var w = state.w / 100; return Math.round((w * V[id].T + (1 - w) * comm(id)) * 100) / 100; }
+  function metric(id, key) { return key === "tech" ? V[id].T : key === "comm" ? comm(id) : overall(id); }
+  function f2(n) { return n.toFixed(2); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function excluded(id) { return state.needAuto && V[id].auto !== "y" && V[id].auto !== "q"; }
+
+  var LABELS = { overall: "Overall", tech: "Technical", comm: "Commercial" };
+
+  function rankRows(key, forPrint) {
+    var ids = ORDER.slice().sort(function (a, b) {
+      var ea = excluded(a), eb = excluded(b);
+      if (ea !== eb) return ea ? 1 : -1;
+      return metric(b, key) - metric(a, key) || overall(b) - overall(a) || V[b].T - V[a].T;
+    });
+    var rows = [], prev = null, rank = 0, shown = 0, counts = {};
+    ids.forEach(function (id) { if (!excluded(id)) { var k = f2(metric(id, key)); counts[k] = (counts[k] || 0) + 1; } });
+    ids.forEach(function (id) {
+      var v = V[id], ex = excluded(id), m = metric(id, key), rk = "";
+      if (!ex) {
+        shown++;
+        if (prev === null || f2(m) !== f2(prev)) rank = shown;
+        prev = m;
+        rk = rank + (counts[f2(m)] > 1 ? "=" : "");
+      }
+      var a = AUTO_TEXT[v.auto];
+      var name = forPrint ? '<b>' + esc(v.name) + '</b>' : '<button type="button" class="vbtn" data-open="' + id + '">' + esc(v.name) + '</button>';
+      rows.push(
+        '<tr class="' + (ex ? "excluded" : "") + '">' +
+        '<td class="rk">' + (ex ? "–" : rk) + "</td>" +
+        '<td>' + name + '<span class="vsub">' + esc(v.sub) + "</span></td>" +
+        '<td class="bar-cell"><div class="bar" role="img" aria-label="' + esc(LABELS[key]) + " " + f2(m) + ' out of 10"><i style="width:' + (m * 10).toFixed(1) + '%"></i></div></td>' +
+        '<td class="n' + (key === "overall" ? " hot" : "") + '">' + f2(overall(id)) + "</td>" +
+        '<td class="n' + (key === "tech" ? " hot" : "") + '">' + f2(v.T) + "</td>" +
+        '<td class="n' + (key === "comm" ? " hot" : "") + '">' + f2(comm(id)) + "</td>" +
+        '<td><span class="yn ' + a[1] + '">' + a[0] + "</span></td>" +
+        '<td class="price">' + esc(v.price) + "<small>" + esc(v.basis) + "</small></td>" +
+        '<td class="keep">' + (ex ? '<span class="chip plain">Excluded: no auto doffing</span>' : '<span class="chip ' + v.tone + '">' + esc(v.verdict) + "</span>") + "</td>" +
+        "</tr>"
+      );
+    });
+    return rows.join("");
+  }
+
+  function rankHead(key) {
+    return '<thead><tr><th scope="col">Rank</th><th scope="col">Vendor</th><th scope="col">' + LABELS[key] + '</th><th scope="col" class="n">Overall</th><th scope="col" class="n">Tech.</th><th scope="col" class="n">Comm.</th><th scope="col">Auto doffing</th><th scope="col">Price, USD</th><th scope="col">Verdict</th></tr></thead>';
+  }
+
+  function renderRanking() {
+    document.getElementById("bar-h").textContent = LABELS[state.sort];
+    document.getElementById("rank-body").innerHTML = rankRows(state.sort, false);
+
+    var notes = {
+      overall: state.w + " % technical + " + (100 - state.w) + " % commercial",
+      tech: "technical score only",
+      comm: "commercial score only"
+    };
+    document.getElementById("print-ranks").innerHTML = ["overall", "tech", "comm"].map(function (key) {
+      return '<div class="pr-block"><h3 class="pr-h">Ranked by ' + LABELS[key].toLowerCase() + ' score <span>(' + notes[key] + ')</span></h3>' +
+        '<div class="tw"><table class="rank-t">' + rankHead(key) + "<tbody>" + rankRows(key, true) + "</tbody></table></div></div>";
+    }).join("");
+
+    var ps = document.getElementById("print-settings");
+    ps.textContent = "Three rankings follow: by overall, technical and commercial score. Overall = " + state.w + " % technical + " + (100 - state.w) + " % commercial. Offers without automatic doffing are " + (state.needAuto ? "excluded" : "included") + ".";
+  }
+
+  function heat(val, max) {
+    if (!max) return "";
+    var pct = Math.max(0, Math.min(1, val / max)) * 48;
+    return ' style="background: color-mix(in srgb, var(--indigo) ' + pct.toFixed(0) + '%, var(--sheet))"';
+  }
+
+  function renderMatrix() {
+    var h = ['<thead><tr><th scope="col">Criterion</th><th scope="col" class="n">Max</th>'];
+    ORDER.forEach(function (id) {
+      h.push('<th scope="col" class="vh' + (id === state.sel ? " selcol" : "") + '"><b>' + id + "</b><span>" + esc(V[id].short) + "</span></th>");
+    });
+    h.push("</tr></thead><tbody>");
+    function cells(get, max, cls) {
+      return ORDER.map(function (id) {
+        var val = get(id);
+        var sel = id === state.sel ? " selcol" : "";
+        return '<td class="cell' + sel + (cls ? " " + cls(id) : "") + '"' + heat(val, max) + ">" + f2(val) + (cls && cls(id) ? "*" : "") + "</td>";
+      }).join("");
+    }
+    h.push('<tr class="grp"><th colspan="' + (ORDER.length + 2) + '">Technical</th></tr>');
+    TECH.forEach(function (grp) {
+      grp.rows.forEach(function (r) {
+        h.push('<tr><th scope="row"><span class="code">' + r[0] + "</span>" + esc(r[1]) + '</th><td class="mx-max n">' + r[2].toFixed(2) + "</td>" + cells(function (id) { return V[id].s[r[0]]; }, r[2]) + "</tr>");
+      });
+      if (grp.max) {
+        h.push('<tr class="sub"><th scope="row">' + esc(grp.g) + ' subtotal</th><td class="mx-max n">' + grp.max.toFixed(2) + "</td>" + cells(function (id) {
+          return grp.rows.reduce(function (t, r) { return t + V[id].s[r[0]]; }, 0);
+        }, grp.max) + "</tr>");
+      }
+    });
+    h.push('<tr class="total"><th scope="row">Technical total</th><td class="mx-max n">10.00</td>' + cells(function (id) { return V[id].T; }, 10) + "</tr>");
+    h.push('<tr class="grp"><th colspan="' + (ORDER.length + 2) + '">Commercial</th></tr>');
+    COMM.forEach(function (r) {
+      h.push('<tr><th scope="row"><span class="code">' + r[0] + "</span>" + esc(r[1]) + '</th><td class="mx-max n">' + r[2].toFixed(2) + "</td>" + cells(function (id) { return V[id].c[r[0]]; }, r[2]) + "</tr>");
+    });
+    h.push('<tr class="total"><th scope="row">Commercial total</th><td class="mx-max n">10.00</td>' + cells(comm, 10) + "</tr>");
+    h.push('<tr class="total"><th scope="row">Overall · ' + state.w + " / " + (100 - state.w) + '</th><td class="mx-max n">10.00</td>' + cells(overall, 10) + "</tr>");
+    h.push("</tbody>");
+    document.getElementById("matrix").innerHTML = h.join("");
+  }
+
+  function bar(label, val, max) {
+    return '<div class="sbr"><span>' + esc(label) + '</span><div class="bar" aria-hidden="true"><i style="width:' + (max ? (val / max * 100).toFixed(1) : 0) + '%"></i></div><span class="num">' + f2(val) + " / " + max.toFixed(1) + "</span></div>";
+  }
+
+  function renderProfiles() {
+    ORDER.forEach(function (id) {
+      var v = V[id];
+      var pills = document.querySelector('[data-pills="' + id + '"]');
+      pills.innerHTML =
+        '<div class="pill main"><span>Overall</span><b>' + f2(overall(id)) + "</b></div>" +
+        '<div class="pill"><span>Technical</span><b>' + f2(v.T) + "</b></div>" +
+        '<div class="pill"><span>Commercial</span><b>' + f2(comm(id)) + "</b></div>";
+      var tech = TECH.map(function (g) {
+        if (g.max) return bar(g.g, g.rows.reduce(function (t, r) { return t + v.s[r[0]]; }, 0), g.max);
+        return g.rows.map(function (r) { return bar(r[1], v.s[r[0]], r[2]); }).join("");
+      }).join("");
+      var com = COMM.map(function (r) { return bar(r[1], v.c[r[0]], r[2]); }).join("");
+      document.querySelector('[data-bars="' + id + '"]').innerHTML =
+        '<div class="sb"><h4>Technical breakdown</h4>' + tech + '</div><div class="sb"><h4>Commercial breakdown</h4>' + com + "</div>";
+      var panel = document.getElementById("vp-" + id);
+      panel.classList.toggle("active", id === state.sel);
+    });
+    document.getElementById("wrap").classList.toggle("one-at-a-time", state.view === "one");
+    document.querySelectorAll("#tabs button").forEach(function (t) {
+      t.setAttribute("aria-pressed", t.getAttribute("data-v") === state.sel ? "true" : "false");
+    });
+  }
+
+  function buildTabs() {
+    document.getElementById("tabs").innerHTML = ORDER.map(function (id) {
+      return '<button type="button" id="tab-' + id + '" data-v="' + id + '" aria-controls="vp-' + id + '"><b>' + id + "</b>" + esc(V[id].name) + "</button>";
+    }).join("");
+  }
+
+  function syncControls() {
+    document.querySelectorAll("[data-sort]").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-sort") === state.sort ? "true" : "false"); });
+    document.getElementById("w").value = state.w;
+    document.getElementById("wout").innerHTML = '<span class="num">' + state.w + ' %</span> technical · <span class="num">' + (100 - state.w) + " %</span> commercial";
+    document.getElementById("needauto").checked = state.needAuto;
+    document.querySelectorAll("[data-view]").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-view") === state.view ? "true" : "false"); });
+  }
+
+  function renderAll() { syncControls(); renderRanking(); renderMatrix(); renderProfiles(); save(); }
+
+  function select(id, scroll) {
+    state.sel = id;
+    renderMatrix(); renderProfiles(); save();
+    if (!scroll) return;
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var target = document.getElementById(state.view === "one" ? "profiles" : "vp-" + id);
+    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  }
+
+  buildTabs();
+
+  document.querySelectorAll("[data-sort]").forEach(function (b) {
+    b.addEventListener("click", function () { state.sort = b.getAttribute("data-sort"); renderAll(); });
+  });
+  document.getElementById("w").addEventListener("input", function (e) { state.w = parseInt(e.target.value, 10) || 0; renderAll(); });
+  document.getElementById("needauto").addEventListener("change", function (e) { state.needAuto = e.target.checked; renderAll(); });
+  document.getElementById("reset").addEventListener("click", function () { state = Object.assign({}, DEFAULTS); renderAll(); });
+
+  document.getElementById("rank-body").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-open]");
+    if (!b) return;
+    select(b.getAttribute("data-open"), true);
+  });
+
+  var tabs = document.getElementById("tabs");
+  tabs.addEventListener("click", function (e) {
+    var t = e.target.closest("button[data-v]");
+    if (t) select(t.getAttribute("data-v"), state.view === "all");
+  });
+  document.querySelectorAll("[data-view]").forEach(function (b) {
+    b.addEventListener("click", function () { state.view = b.getAttribute("data-view"); renderAll(); });
+  });
+
+  var wrapEl = document.getElementById("wrap");
+  function printOn() { wrapEl.classList.add("printing"); }
+  function printOff() { wrapEl.classList.remove("printing"); }
+  window.addEventListener("beforeprint", printOn);
+  window.addEventListener("afterprint", printOff);
+  if (window.matchMedia) {
+    var printMq = window.matchMedia("print");
+    var onPrintChange = function (e) { if (e.matches) printOn(); else printOff(); };
+    if (printMq.addEventListener) printMq.addEventListener("change", onPrintChange);
+    else if (printMq.addListener) printMq.addListener(onPrintChange);
+  }
+
+  renderAll();
+})();
+</script>
+
+</body>
+</html>
