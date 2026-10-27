@@ -108,7 +108,7 @@ input[type="range"] { width: 100%; accent-color: var(--indigo); margin: 0; }
 .reset:hover, .seg button:hover { background: var(--indigo-soft); color: var(--ink); }
 .seg button[aria-pressed="true"]:hover { background: var(--indigo); color: var(--indigo-ink); }
 .print-hint { grid-column: 1 / -1; font-size: 12.5px; color: var(--ink-3); border-top: 1px solid var(--rule); padding-top: 10px; }
-button:focus-visible, input:focus-visible, [role="tab"]:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
 
 /* Tables */
 .tw { overflow-x: auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); }
@@ -169,12 +169,21 @@ tr.excluded td.keep { opacity: 1; }
 
 /* Profiles */
 .tabs { display: flex; flex-wrap: wrap; gap: 6px; }
-.tabs [role="tab"] { font: 500 13.5px/1.2 var(--f-body); color: var(--ink); background: var(--sheet); border: 1px solid var(--rule-strong); border-radius: 7px; padding: 8px 11px; cursor: pointer; display: inline-flex; gap: 8px; align-items: baseline; }
-.tabs [role="tab"] b { font-family: var(--f-data); font-size: 12.5px; color: var(--ink-3); }
-.tabs [role="tab"][aria-selected="true"] { background: var(--indigo); border-color: var(--indigo); color: var(--indigo-ink); }
-.tabs [role="tab"][aria-selected="true"] b { color: var(--indigo-ink); }
+.tabs button { font: 500 13.5px/1.2 var(--f-body); color: var(--ink); background: var(--sheet); border: 1px solid var(--rule-strong); border-radius: 7px; padding: 8px 11px; cursor: pointer; display: inline-flex; gap: 8px; align-items: baseline; }
+.tabs button b { font-family: var(--f-data); font-size: 12.5px; color: var(--ink-3); }
+.tabs button[aria-pressed="true"] { background: var(--indigo); border-color: var(--indigo); color: var(--indigo-ink); }
+.tabs button[aria-pressed="true"] b { color: var(--indigo-ink); }
 .vp { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 20px 22px; display: grid; gap: 18px; min-width: 0; }
-@media screen { .vp:not(.active) { display: none; } }
+.vp-bar { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: space-between; }
+.vp-bar .tabs { min-width: 0; }
+@media screen {
+  .wrap.one-at-a-time:not(.printing) .vp:not(.active) { display: none; }
+  .wrap:not(.one-at-a-time):not(.printing) .vp.active { border-color: var(--indigo); box-shadow: 0 0 0 1px var(--indigo); }
+}
+/* Set by the print events, so every profile prints even where the browser keeps screen styles while printing */
+.printing .no-print { display: none !important; }
+.printing .print-only { display: block; }
+.printing .scorebars { display: none; }
 .vp-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 16px; align-items: center; }
 .vcode { font: 700 26px/1 var(--f-data); color: var(--indigo); border: 2px solid var(--indigo); border-radius: 6px; padding: 8px 9px; }
 .vp-head h3 { font-size: 23px; font-stretch: 86%; }
@@ -307,7 +316,7 @@ tr.excluded td.keep { opacity: 1; }
 </head>
 <body>
 
-<div class="wrap">
+<div class="wrap" id="wrap">
 
   <header class="doc-head">
     <div class="eyebrow">Bid evaluation · Yarn-dyeing project winding machinery</div>
@@ -370,7 +379,7 @@ tr.excluded td.keep { opacity: 1; }
         <label class="check" for="needauto"><input type="checkbox" id="needauto"><span>Exclude offers without automatic doffing<small>Excluded offers stay listed, greyed, without a rank.</small></span></label>
         <button type="button" class="reset" id="reset">Reset to report settings</button>
       </div>
-      <p class="print-hint">Prints on A4 portrait from the browser's print command. The controls are left out, every vendor profile prints in full, and the ranking prints with the settings shown here.</p>
+      <p class="print-hint">Prints on A4 portrait from the browser's print command. The controls are left out, all seven vendor profiles print whichever view is selected, and the ranking prints with the settings shown here.</p>
     </div>
 
     <p class="print-only print-settings" id="print-settings"></p>
@@ -494,12 +503,18 @@ tr.excluded td.keep { opacity: 1; }
     <div class="sec-head">
       <div class="eyebrow">Questions 2, 3 and 4 · Per vendor</div>
       <h2 id="h-prof">Vendor profiles</h2>
-      <p>What each offer exceeds, where it falls short, and what to ask before the next round. On screen, each profile also charts its score breakdown.</p>
+      <p>What each offer exceeds, where it falls short, and what to ask before the next round. Select a vendor to go to its profile, or switch to one at a time. On screen, each profile also charts its score breakdown.</p>
     </div>
 
-    <div class="tabs no-print" role="tablist" aria-label="Vendors" id="tabs"></div>
+    <div class="vp-bar no-print">
+      <div class="tabs" role="group" aria-label="Go to a vendor" id="tabs"></div>
+      <div class="seg" role="group" aria-label="Profiles shown">
+        <button type="button" id="view-all" data-view="all" aria-pressed="true">All vendors</button>
+        <button type="button" id="view-one" data-view="one" aria-pressed="false">One at a time</button>
+      </div>
+    </div>
 
-    <article class="vp" id="vp-GH" data-v="GH" role="tabpanel" aria-labelledby="tab-GH">
+    <article class="vp" id="vp-GH" data-v="GH">
       <div class="vp-head"><span class="vcode">GH</span><div><h3>Foshan Gonghong Textile Machinery</h3><span class="vsub">China · manufacturer · quotation GH-XP26-14840 of 10 Oct 2026, signed and stamped</span></div><div class="pills" data-pills="GH"></div></div>
       <dl class="terms">
         <div class="wide"><dt>Models</dt><dd>GH018-S soft, 8 single-sided sets × 6 spindles · GH018-M hard, 10 sets × 6 spindles · GH018-A fully automatic tuck-in thread winder, 12 sets × 4 spindles. Alternative: GH019-SA automatic A-cone winder, 12 sets × 4 spindles / 8 cones.</dd></div>
@@ -542,7 +557,7 @@ tr.excluded td.keep { opacity: 1; }
       <div class="scorebars" data-bars="GH"></div>
     </article>
 
-    <article class="vp" id="vp-DM" data-v="DM" role="tabpanel" aria-labelledby="tab-DM">
+    <article class="vp" id="vp-DM" data-v="DM">
       <div class="vp-head"><span class="vcode">DM</span><div><h3>Ningbo Dingming Machinery</h3><span class="vsub">China · manufacturer with an import-export arm · quotes of 9 Oct 2026</span></div><div class="pills" data-pills="DM"></div></div>
       <dl class="terms">
         <div class="wide"><dt>Models</dt><dd>DM0702-SF soft (48 sp) · DM0702-TH hard (60 sp) · DM0605 fully automatic thread winder, 2 sets of 25 heads</dd></div>
@@ -583,7 +598,7 @@ tr.excluded td.keep { opacity: 1; }
       <div class="scorebars" data-bars="DM"></div>
     </article>
 
-    <article class="vp" id="vp-TS" data-v="TS" role="tabpanel" aria-labelledby="tab-TS">
+    <article class="vp" id="vp-TS" data-v="TS">
       <div class="vp-head"><span class="vcode">TS</span><div><h3>Jiangsu Tangshi Textile Machinery Group</h3><span class="vsub">China · manufacturer · quotation 26INV1004 · scored as Option B</span></div><div class="pills" data-pills="TS"></div></div>
       <dl class="terms">
         <div class="wide"><dt>Models</dt><dd>TS008S soft (48 sp) · TS008M hard (60 sp) · TS008O fully automatic, 2 × 24 spindles (Option B). Option A: TS008O standard, 12 × 4 spindles, no auto doffing.</dd></div>
@@ -624,7 +639,7 @@ tr.excluded td.keep { opacity: 1; }
       <div class="scorebars" data-bars="TS"></div>
     </article>
 
-    <article class="vp" id="vp-TH" data-v="TH" role="tabpanel" aria-labelledby="tab-TH">
+    <article class="vp" id="vp-TH" data-v="TH">
       <div class="vp-head"><span class="vcode">TH</span><div><h3>Zhejiang Taihe Spinning Machine</h3><span class="vsub">China · manufacturer · quotations of 10 Oct 2026</span></div><div class="pills" data-pills="TH"></div></div>
       <dl class="terms">
         <div class="wide"><dt>Models</dt><dd>TH-11A-1 precision soft winder (48 sp) · TH-8H hard (60 sp) · TH-15A thread winder, 12 × 4 spindles</dd></div>
@@ -664,7 +679,7 @@ tr.excluded td.keep { opacity: 1; }
     </article>
 
 
-    <article class="vp" id="vp-CS" data-v="CS" role="tabpanel" aria-labelledby="tab-CS">
+    <article class="vp" id="vp-CS" data-v="CS">
       <div class="vp-head"><span class="vcode">CS</span><div><h3>Charming Star International</h3><span class="vsub">Taiwan · ships FOB Shanghai · quotation BD261008SA of 8 Oct 2026</span></div><div class="pills" data-pills="CS"></div></div>
       <dl class="terms">
         <div class="wide"><dt>Models</dt><dd>CMcw-600C soft (4 × 12) · CMcw-600CH hard (5 × 12) · CMsp-2A spool winder, 4 sets × 6 spindles × 2 bobbins</dd></div>
@@ -702,7 +717,7 @@ tr.excluded td.keep { opacity: 1; }
       <div class="scorebars" data-bars="CS"></div>
     </article>
 
-    <article class="vp" id="vp-CO" data-v="CO" role="tabpanel" aria-labelledby="tab-CO">
+    <article class="vp" id="vp-CO" data-v="CO">
       <div class="vp-head"><span class="vcode">CO</span><div><h3>Ningbo Credit Ocean Machinery</h3><span class="vsub">China · may be a trading company · prices of 16 Oct 2026</span></div><div class="pills" data-pills="CO"></div></div>
       <dl class="terms">
         <div class="wide"><dt>Models</dt><dd>None given. Two winder options in 12-spindle sets; automatic thread winder in 4-spindle units, "4-inch bobbin type".</dd></div>
@@ -737,7 +752,7 @@ tr.excluded td.keep { opacity: 1; }
       <div class="scorebars" data-bars="CO"></div>
     </article>
 
-    <article class="vp" id="vp-MH" data-v="MH" role="tabpanel" aria-labelledby="tab-MH">
+    <article class="vp" id="vp-MH" data-v="MH">
       <div class="vp-head"><span class="vcode">MH</span><div><h3>Milhan Makine</h3><span class="vsub">Turkey · manufacturer · offer of 9 Oct 2026</span></div><div class="pills" data-pills="MH"></div></div>
       <dl class="terms">
         <div class="wide"><dt>Models</dt><dd>FSM-01 hard winder, 60 spindles (5 × 12), double-sided. Soft and sewing-thread machines declined.</dd></div>
@@ -882,8 +897,8 @@ tr.excluded td.keep { opacity: 1; }
   };
   var ORDER = ["GH", "DM", "TS", "TH", "CS", "CO", "MH"];
   var AUTO_TEXT = { y: ["Yes", "y"], n: ["No", "n"], q: ["Claimed", "q"], x: ["Not offered", "n"] };
-  var DEFAULTS = { w: 60, sort: "overall", needAuto: false, sel: "GH" };
-  var KEY = "wm-bid-eval-v2";
+  var DEFAULTS = { w: 60, sort: "overall", needAuto: false, sel: "GH", view: "all" };
+  var KEY = "wm-bid-eval-v3";
 
   function sum(obj) { var t = 0; for (var k in obj) t += obj[k]; return Math.round(t * 100) / 100; }
   ORDER.forEach(function (id) { V[id].T = sum(V[id].s); V[id].C = sum(V[id].c); });
@@ -896,6 +911,7 @@ tr.excluded td.keep { opacity: 1; }
       if (["overall", "tech", "comm"].indexOf(saved.sort) > -1) state.sort = saved.sort;
       state.needAuto = !!saved.needAuto;
       if (V[saved.sel]) state.sel = saved.sel;
+      if (saved.view === "one") state.view = "one";
     }
   } catch (e) { /* storage unavailable: use defaults */ }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignore */ } }
@@ -1011,16 +1027,15 @@ tr.excluded td.keep { opacity: 1; }
       var panel = document.getElementById("vp-" + id);
       panel.classList.toggle("active", id === state.sel);
     });
-    document.querySelectorAll('#tabs [role="tab"]').forEach(function (t) {
-      var on = t.getAttribute("data-v") === state.sel;
-      t.setAttribute("aria-selected", on ? "true" : "false");
-      t.tabIndex = on ? 0 : -1;
+    document.getElementById("wrap").classList.toggle("one-at-a-time", state.view === "one");
+    document.querySelectorAll("#tabs button").forEach(function (t) {
+      t.setAttribute("aria-pressed", t.getAttribute("data-v") === state.sel ? "true" : "false");
     });
   }
 
   function buildTabs() {
     document.getElementById("tabs").innerHTML = ORDER.map(function (id) {
-      return '<button type="button" role="tab" id="tab-' + id + '" data-v="' + id + '" aria-controls="vp-' + id + '"><b>' + id + "</b>" + esc(V[id].name) + "</button>";
+      return '<button type="button" id="tab-' + id + '" data-v="' + id + '" aria-controls="vp-' + id + '"><b>' + id + "</b>" + esc(V[id].name) + "</button>";
     }).join("");
   }
 
@@ -1029,14 +1044,18 @@ tr.excluded td.keep { opacity: 1; }
     document.getElementById("w").value = state.w;
     document.getElementById("wout").innerHTML = '<span class="num">' + state.w + ' %</span> technical · <span class="num">' + (100 - state.w) + " %</span> commercial";
     document.getElementById("needauto").checked = state.needAuto;
+    document.querySelectorAll("[data-view]").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-view") === state.view ? "true" : "false"); });
   }
 
   function renderAll() { syncControls(); renderRanking(); renderMatrix(); renderProfiles(); save(); }
 
-  function select(id, focusTab) {
+  function select(id, scroll) {
     state.sel = id;
     renderMatrix(); renderProfiles(); save();
-    if (focusTab) document.getElementById("tab-" + id).focus();
+    if (!scroll) return;
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var target = document.getElementById(state.view === "one" ? "profiles" : "vp-" + id);
+    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   }
 
   buildTabs();
@@ -1051,23 +1070,29 @@ tr.excluded td.keep { opacity: 1; }
   document.getElementById("rank-body").addEventListener("click", function (e) {
     var b = e.target.closest("[data-open]");
     if (!b) return;
-    select(b.getAttribute("data-open"), false);
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document.getElementById("profiles").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    select(b.getAttribute("data-open"), true);
   });
 
   var tabs = document.getElementById("tabs");
   tabs.addEventListener("click", function (e) {
-    var t = e.target.closest('[role="tab"]');
-    if (t) select(t.getAttribute("data-v"), false);
+    var t = e.target.closest("button[data-v]");
+    if (t) select(t.getAttribute("data-v"), state.view === "all");
   });
-  tabs.addEventListener("keydown", function (e) {
-    var i = ORDER.indexOf(state.sel);
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); select(ORDER[(i + 1) % ORDER.length], true); }
-    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); select(ORDER[(i - 1 + ORDER.length) % ORDER.length], true); }
-    else if (e.key === "Home") { e.preventDefault(); select(ORDER[0], true); }
-    else if (e.key === "End") { e.preventDefault(); select(ORDER[ORDER.length - 1], true); }
+  document.querySelectorAll("[data-view]").forEach(function (b) {
+    b.addEventListener("click", function () { state.view = b.getAttribute("data-view"); renderAll(); });
   });
+
+  var wrapEl = document.getElementById("wrap");
+  function printOn() { wrapEl.classList.add("printing"); }
+  function printOff() { wrapEl.classList.remove("printing"); }
+  window.addEventListener("beforeprint", printOn);
+  window.addEventListener("afterprint", printOff);
+  if (window.matchMedia) {
+    var printMq = window.matchMedia("print");
+    var onPrintChange = function (e) { if (e.matches) printOn(); else printOff(); };
+    if (printMq.addEventListener) printMq.addEventListener("change", onPrintChange);
+    else if (printMq.addListener) printMq.addListener(onPrintChange);
+  }
 
   renderAll();
 })();
