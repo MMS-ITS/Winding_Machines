@@ -183,6 +183,11 @@ tr.excluded td.keep { opacity: 1; }
 /* Set by the print events, so every profile prints even where the browser keeps screen styles while printing */
 .printing .no-print { display: none !important; }
 .printing .print-only { display: block; }
+.printing .screen-only { display: none !important; }
+.printing .print-ranks.print-only { display: block; }
+.printing.wrap, .printing section, .printing .pr-block { display: block; }
+.printing.wrap > * + *, .printing section > * + * { margin-top: 18px; }
+.printing .pr-block + .pr-block { margin-top: 18px; }
 .printing .scorebars { display: none; }
 .vp-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 16px; align-items: center; }
 .vcode { font: 700 26px/1 var(--f-data); color: var(--indigo); border: 2px solid var(--indigo); border-radius: 6px; padding: 8px 9px; }
@@ -230,6 +235,9 @@ tr.excluded td.keep { opacity: 1; }
 .calc th, .calc td { padding: 5px 6px; }
 .foot { font-size: 12.5px; color: var(--ink-3); border-top: 1px solid var(--rule); padding-top: 14px; display: grid; gap: 6px; }
 .print-only { display: none; }
+.pr-block { display: grid; gap: 6px; break-inside: avoid; }
+.pr-h { font-size: 15px; font-stretch: 90%; }
+.pr-h span { font: 400 13px/1.3 var(--f-body); color: var(--ink-3); }
 
 @media (max-width: 860px) {
   .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -262,6 +270,16 @@ tr.excluded td.keep { opacity: 1; }
   .wrap { max-width: none; gap: 7mm; }
   .no-print { display: none !important; }
   .print-only { display: block; }
+  .screen-only { display: none !important; }
+  /* Block flow in print: Chrome can overlap grid items that split across pages */
+  .wrap, section, .pr-block { display: block; }
+  .wrap > * + * { margin-top: 7mm; }
+  section > * + * { margin-top: 3.5mm; }
+  .print-ranks.print-only { display: block; }
+  .pr-block + .pr-block { margin-top: 5mm; }
+  .pr-h { margin-bottom: 1.5mm; }
+  .pr-h { font-size: 10.5pt; }
+  .pr-h span { font-size: 7.6pt; }
   h1 { font-size: 22pt; }
   h2 { font-size: 13.5pt; }
   h3 { font-size: 11pt; }
@@ -379,12 +397,12 @@ tr.excluded td.keep { opacity: 1; }
         <label class="check" for="needauto"><input type="checkbox" id="needauto"><span>Exclude offers without automatic doffing<small>Excluded offers stay listed, greyed, without a rank.</small></span></label>
         <button type="button" class="reset" id="reset">Reset to report settings</button>
       </div>
-      <p class="print-hint">Prints on A4 portrait from the browser's print command. The controls are left out, all seven vendor profiles print whichever view is selected, and the ranking prints with the settings shown here.</p>
+      <p class="print-hint">Prints on A4 portrait from the browser's print command. The controls are left out. The printout carries all three rankings (overall, technical and commercial) and all seven vendor profiles, whichever buttons are selected here. The weighting and filter set here are applied.</p>
     </div>
 
     <p class="print-only print-settings" id="print-settings"></p>
 
-    <div class="tw">
+    <div class="tw screen-only">
       <table class="rank-t" id="rank-table">
         <thead>
           <tr><th scope="col">Rank</th><th scope="col">Vendor</th><th scope="col" id="bar-h">Overall</th><th scope="col" class="n">Overall</th><th scope="col" class="n">Tech.</th><th scope="col" class="n">Comm.</th><th scope="col">Auto doffing</th><th scope="col">Price, USD</th><th scope="col">Verdict</th></tr>
@@ -392,6 +410,7 @@ tr.excluded td.keep { opacity: 1; }
         <tbody id="rank-body"></tbody>
       </table>
     </div>
+    <div class="print-only print-ranks" id="print-ranks"></div>
     <p class="note" id="rank-note"><b>Gonghong and Dingming share a commercial score of 7.65.</b> Gonghong is 21% cheaper for the full scope; Dingming has better terms. Gonghong's higher technical score keeps it first at every weighting.</p>
   </section>
 
@@ -918,23 +937,23 @@ tr.excluded td.keep { opacity: 1; }
 
   function comm(id) { return V[id].C; }
   function overall(id) { var w = state.w / 100; return Math.round((w * V[id].T + (1 - w) * comm(id)) * 100) / 100; }
-  function metric(id) { return state.sort === "tech" ? V[id].T : state.sort === "comm" ? comm(id) : overall(id); }
+  function metric(id, key) { return key === "tech" ? V[id].T : key === "comm" ? comm(id) : overall(id); }
   function f2(n) { return n.toFixed(2); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function excluded(id) { return state.needAuto && V[id].auto !== "y" && V[id].auto !== "q"; }
 
-  function renderRanking() {
+  var LABELS = { overall: "Overall", tech: "Technical", comm: "Commercial" };
+
+  function rankRows(key, forPrint) {
     var ids = ORDER.slice().sort(function (a, b) {
       var ea = excluded(a), eb = excluded(b);
       if (ea !== eb) return ea ? 1 : -1;
-      return metric(b) - metric(a) || overall(b) - overall(a) || V[b].T - V[a].T;
+      return metric(b, key) - metric(a, key) || overall(b) - overall(a) || V[b].T - V[a].T;
     });
-    var labels = { overall: "Overall", tech: "Technical", comm: "Commercial" };
-    document.getElementById("bar-h").textContent = labels[state.sort];
     var rows = [], prev = null, rank = 0, shown = 0, counts = {};
-    ids.forEach(function (id) { if (!excluded(id)) { var k = f2(metric(id)); counts[k] = (counts[k] || 0) + 1; } });
+    ids.forEach(function (id) { if (!excluded(id)) { var k = f2(metric(id, key)); counts[k] = (counts[k] || 0) + 1; } });
     ids.forEach(function (id) {
-      var v = V[id], ex = excluded(id), m = metric(id), rk = "";
+      var v = V[id], ex = excluded(id), m = metric(id, key), rk = "";
       if (!ex) {
         shown++;
         if (prev === null || f2(m) !== f2(prev)) rank = shown;
@@ -942,26 +961,44 @@ tr.excluded td.keep { opacity: 1; }
         rk = rank + (counts[f2(m)] > 1 ? "=" : "");
       }
       var a = AUTO_TEXT[v.auto];
-      var c = comm(id);
-      var cTxt = f2(c);
+      var name = forPrint ? '<b>' + esc(v.name) + '</b>' : '<button type="button" class="vbtn" data-open="' + id + '">' + esc(v.name) + '</button>';
       rows.push(
         '<tr class="' + (ex ? "excluded" : "") + '">' +
         '<td class="rk">' + (ex ? "–" : rk) + "</td>" +
-        '<td><button type="button" class="vbtn" data-open="' + id + '">' + esc(v.name) + '</button><span class="vsub">' + esc(v.sub) + "</span></td>" +
-        '<td class="bar-cell"><div class="bar" role="img" aria-label="' + esc(labels[state.sort]) + " " + f2(m) + ' out of 10"><i style="width:' + (m * 10).toFixed(1) + '%"></i></div></td>' +
-        '<td class="n' + (state.sort === "overall" ? " hot" : "") + '">' + f2(overall(id)) + "</td>" +
-        '<td class="n' + (state.sort === "tech" ? " hot" : "") + '">' + f2(v.T) + "</td>" +
-        '<td class="n' + (state.sort === "comm" ? " hot" : "") + '">' + cTxt + "</td>" +
+        '<td>' + name + '<span class="vsub">' + esc(v.sub) + "</span></td>" +
+        '<td class="bar-cell"><div class="bar" role="img" aria-label="' + esc(LABELS[key]) + " " + f2(m) + ' out of 10"><i style="width:' + (m * 10).toFixed(1) + '%"></i></div></td>' +
+        '<td class="n' + (key === "overall" ? " hot" : "") + '">' + f2(overall(id)) + "</td>" +
+        '<td class="n' + (key === "tech" ? " hot" : "") + '">' + f2(v.T) + "</td>" +
+        '<td class="n' + (key === "comm" ? " hot" : "") + '">' + f2(comm(id)) + "</td>" +
         '<td><span class="yn ' + a[1] + '">' + a[0] + "</span></td>" +
         '<td class="price">' + esc(v.price) + "<small>" + esc(v.basis) + "</small></td>" +
         '<td class="keep">' + (ex ? '<span class="chip plain">Excluded: no auto doffing</span>' : '<span class="chip ' + v.tone + '">' + esc(v.verdict) + "</span>") + "</td>" +
         "</tr>"
       );
     });
-    document.getElementById("rank-body").innerHTML = rows.join("");
+    return rows.join("");
+  }
+
+  function rankHead(key) {
+    return '<thead><tr><th scope="col">Rank</th><th scope="col">Vendor</th><th scope="col">' + LABELS[key] + '</th><th scope="col" class="n">Overall</th><th scope="col" class="n">Tech.</th><th scope="col" class="n">Comm.</th><th scope="col">Auto doffing</th><th scope="col">Price, USD</th><th scope="col">Verdict</th></tr></thead>';
+  }
+
+  function renderRanking() {
+    document.getElementById("bar-h").textContent = LABELS[state.sort];
+    document.getElementById("rank-body").innerHTML = rankRows(state.sort, false);
+
+    var notes = {
+      overall: state.w + " % technical + " + (100 - state.w) + " % commercial",
+      tech: "technical score only",
+      comm: "commercial score only"
+    };
+    document.getElementById("print-ranks").innerHTML = ["overall", "tech", "comm"].map(function (key) {
+      return '<div class="pr-block"><h3 class="pr-h">Ranked by ' + LABELS[key].toLowerCase() + ' score <span>(' + notes[key] + ')</span></h3>' +
+        '<div class="tw"><table class="rank-t">' + rankHead(key) + "<tbody>" + rankRows(key, true) + "</tbody></table></div></div>";
+    }).join("");
 
     var ps = document.getElementById("print-settings");
-    ps.textContent = "Ranking shown by " + labels[state.sort].toLowerCase() + " score · overall = " + state.w + " % technical + " + (100 - state.w) + " % commercial · offers without automatic doffing " + (state.needAuto ? "excluded" : "included") + ".";
+    ps.textContent = "Three rankings follow: by overall, technical and commercial score. Overall = " + state.w + " % technical + " + (100 - state.w) + " % commercial. Offers without automatic doffing are " + (state.needAuto ? "excluded" : "included") + ".";
   }
 
   function heat(val, max) {
